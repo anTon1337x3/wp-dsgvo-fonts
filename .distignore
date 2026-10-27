@@ -1,0 +1,10 @@
+.git
+.github
+.gitignore
+.distignore
+.DS_Store
+.idea
+tests
+bin
+dist
+README.md

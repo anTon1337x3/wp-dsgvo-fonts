@@ -25,7 +25,7 @@ if ! wp core is-installed; then
 	wp rewrite structure '/%postname%/' >/dev/null
 fi
 
-wp plugin activate wp-dsgvo-fonts >/dev/null
+wp plugin activate dsgvo-fonts >/dev/null
 wp dsgvo-fonts flush >/dev/null
 
 status=0

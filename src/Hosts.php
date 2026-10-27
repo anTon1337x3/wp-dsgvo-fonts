@@ -4,6 +4,10 @@ namespace WPDsgvoFonts;
 
 defined( 'ABSPATH' ) || exit;
 
+// This class lists the hosts this plugin looks for in order to replace them with local copies; nothing is loaded
+// from these hosts in the browser.
+// phpcs:disable PluginCheck.CodeAnalysis.Offloading.OffloadedContent
+
 /**
  * Knows which third-party hosts serve Google Fonts and Font Awesome, and how to find their URLs in markup.
  */

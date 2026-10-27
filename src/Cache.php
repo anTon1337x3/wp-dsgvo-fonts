@@ -49,10 +49,13 @@ class Cache {
 			$GLOBALS['wp_fastest_cache']->deleteCache( true );
 		}
 
+		// Hooks provided by the respective cache plugins.
+		// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		do_action( 'litespeed_purge_all' );
 		do_action( 'cache_enabler_clear_complete_cache' );
 		do_action( 'breeze_clear_all_cache' );
 		do_action( 'wphb_clear_page_cache' );
+		// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		do_action( 'wpdf_purge_page_caches' );
 	}
 }

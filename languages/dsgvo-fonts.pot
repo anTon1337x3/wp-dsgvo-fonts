@@ -1,0 +1,290 @@
+# Copyright (C) 2026 Anton Lapko
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: DSGVO Fonts 1.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/dsgvo-fonts\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-27T10:12:34+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: dsgvo-fonts\n"
+
+#. Plugin Name of the plugin
+#: dsgvo-fonts.php
+msgid "DSGVO Fonts"
+msgstr ""
+
+#. Description of the plugin
+#: dsgvo-fonts.php
+msgid "Self-hosts Google Fonts and Font Awesome automatically, so visitors' browsers no longer connect to Google or Font Awesome servers."
+msgstr ""
+
+#. Author of the plugin
+#: dsgvo-fonts.php
+msgid "Anton Lapko"
+msgstr ""
+
+#: src/Admin.php:36
+#: src/Admin.php:155
+msgid "Settings"
+msgstr ""
+
+#. translators: %s: name of another font plugin, e.g. OMGF
+#: src/Admin.php:57
+#, php-format
+msgid "%s is active as well. Please deactivate it, so the two plugins don't interfere with each other."
+msgstr ""
+
+#: src/Admin.php:70
+#: src/Admin.php:83
+msgid "You are not allowed to do this."
+msgstr ""
+
+#: src/Admin.php:114
+msgid "Google Fonts and Font Awesome are downloaded by your server on the first page view and served locally afterwards. Visitors' browsers don't connect to Google or Font Awesome."
+msgstr ""
+
+#: src/Admin.php:117
+msgid "The cache was cleared. Fonts are downloaded again on the next page view."
+msgstr ""
+
+#: src/Admin.php:119
+msgid "The page check is complete."
+msgstr ""
+
+#: src/Admin.php:121
+msgid "Settings saved. The font cache was cleared."
+msgstr ""
+
+#: src/Admin.php:124
+msgid "Status"
+msgstr ""
+
+#. translators: 1: number of files, 2: total size, 3: folder
+#: src/Admin.php:129
+#, php-format
+msgid "%1$d local file (%2$s) in %3$s"
+msgid_plural "%1$d local files (%2$s) in %3$s"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin.php:142
+msgid "Clear cache"
+msgstr ""
+
+#: src/Admin.php:145
+msgid "Check page"
+msgstr ""
+
+#: src/Admin.php:146
+msgid "Loads a page like a visitor who isn't logged in and lists all remaining references to Google Fonts or Font Awesome in its HTML and stylesheets."
+msgstr ""
+
+#: src/Admin.php:151
+msgid "Check"
+msgstr ""
+
+#: src/Admin.php:160
+msgid "Services"
+msgstr ""
+
+#: src/Admin.php:162
+msgid "Self-host Google Fonts"
+msgstr ""
+
+#: src/Admin.php:163
+msgid "Self-host Font Awesome"
+msgstr ""
+
+#: src/Admin.php:167
+msgid "Subsets (Google Fonts)"
+msgstr ""
+
+#: src/Admin.php:172
+msgid "If a font offers none of the selected subsets, all of its files are loaded."
+msgstr ""
+
+#: src/Admin.php:180
+msgid "Don't change"
+msgstr ""
+
+#: src/Admin.php:183
+msgid "\"swap\" shows text immediately in a fallback font and prevents invisible text while fonts load."
+msgstr ""
+
+#: src/Admin.php:187
+msgid "Local stylesheets"
+msgstr ""
+
+#: src/Admin.php:189
+msgid "Search theme and plugin stylesheets for imports of Google Fonts / Font Awesome and serve cleaned copies"
+msgstr ""
+
+#: src/Admin.php:193
+msgid "JavaScript guard"
+msgstr ""
+
+#: src/Admin.php:195
+msgid "Block Google Fonts and Font Awesome files that are added by JavaScript"
+msgstr ""
+
+#: src/Admin.php:196
+msgid "Applies e.g. to sliders or widgets that add fonts in the browser. These elements then show the fallback font."
+msgstr ""
+
+#: src/Admin.php:200
+msgid "Font Awesome Kits"
+msgstr ""
+
+#. translators: %s: Font Awesome version number
+#: src/Admin.php:207
+#, php-format
+msgid "Font Awesome Kits (kit scripts) are replaced by a local copy of Font Awesome Free. Leave empty to use the kit's version (fallback: %s). Pro icons and custom kit icons are not included."
+msgstr ""
+
+#: src/Admin.php:212
+msgid "Also load compatibility for Font Awesome 4 classes (fa fa-…)"
+msgstr ""
+
+#: src/Admin.php:216
+msgid "Save and clear cache"
+msgstr ""
+
+#: src/Admin.php:231
+msgid "No files localized yet. Visit a page or use \"Check page\"."
+msgstr ""
+
+#: src/Admin.php:239
+msgid "Local stylesheet copy"
+msgstr ""
+
+#. translators: %d: number of localized sources
+#: src/Admin.php:246
+#, php-format
+msgid "Show %d localized source"
+msgid_plural "Show %d localized sources"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin.php:252
+msgid "Type"
+msgstr ""
+
+#: src/Admin.php:253
+msgid "Source"
+msgstr ""
+
+#: src/Admin.php:254
+msgid "Local file"
+msgstr ""
+
+#: src/Admin.php:255
+msgid "Date"
+msgstr ""
+
+#: src/Admin.php:286
+msgid "Notices and errors:"
+msgstr ""
+
+#. translators: %d: minutes
+#: src/Admin.php:289
+#, php-format
+msgid "Files that can't be downloaded are blocked (the page uses the fallback font) and retried after %d minutes."
+msgstr ""
+
+#. translators: 1: checked URL, 2: date and time
+#: src/Admin.php:310
+#, php-format
+msgid "Result for %1$s from %2$s:"
+msgstr ""
+
+#. translators: %s: error message
+#: src/Admin.php:318
+#, php-format
+msgid "The page could not be checked: %s"
+msgstr ""
+
+#: src/Admin.php:324
+msgid "No references to Google Fonts or Font Awesome found."
+msgstr ""
+
+#. translators: %d: number of references
+#: src/Admin.php:334
+#, php-format
+msgid "%d remaining reference found:"
+msgid_plural "%d remaining references found:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin.php:343
+msgid "References of a service that is disabled in the settings are kept on purpose. If a page cache is active, clear it and check again."
+msgstr ""
+
+#: src/Downloader.php:49
+msgid "Empty response"
+msgstr ""
+
+#: src/Localizer.php:114
+msgid "Unknown file type"
+msgstr ""
+
+#. translators: %s: file path
+#: src/Localizer.php:133
+#, php-format
+msgid "File could not be saved: %s"
+msgstr ""
+
+#: src/Localizer.php:144
+msgid "No @font-face rules in the response from Google"
+msgstr ""
+
+#. translators: 1: error message, 2: Font Awesome version number
+#: src/Localizer.php:278
+#, php-format
+msgid "Kit version could not be detected (%1$s), using Font Awesome Free %2$s"
+msgstr ""
+
+#: src/Localizer.php:285
+msgid "Pro kit detected: Font Awesome Free is provided locally, Pro icons are missing."
+msgstr ""
+
+#: src/Settings.php:19
+msgid "Latin"
+msgstr ""
+
+#: src/Settings.php:20
+msgid "Latin Extended (e.g. ő, ł, ş)"
+msgstr ""
+
+#: src/Settings.php:21
+msgid "Cyrillic"
+msgstr ""
+
+#: src/Settings.php:22
+msgid "Cyrillic Extended"
+msgstr ""
+
+#: src/Settings.php:23
+msgid "Greek"
+msgstr ""
+
+#: src/Settings.php:24
+msgid "Greek Extended"
+msgstr ""
+
+#: src/Settings.php:25
+msgid "Vietnamese"
+msgstr ""
+
+#: src/Settings.php:26
+msgid "Math symbols"
+msgstr ""
+
+#: src/Settings.php:27
+msgid "Symbols"
+msgstr ""

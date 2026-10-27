@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WP DSGVO Fonts – E2E fixtures
+ * Plugin Name: DSGVO Fonts – E2E fixtures
  * Description: Embeds Google Fonts and Font Awesome in every way the plugin has to handle.
  */
 

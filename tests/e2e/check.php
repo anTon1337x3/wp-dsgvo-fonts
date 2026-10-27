@@ -33,18 +33,18 @@ check( 'no Google Fonts / Font Awesome URLs in the HTML' . ( $leak ? " (found: $
 check( 'host names appear nowhere in the HTML, not even in local paths (scanner simulation)', ! preg_match( '~googleapis|gstatic|\.fontawesome\.com~i', $html ) );
 check( 'no preconnect / dns-prefetch to Google, Font Awesome or unused CDNs', ! preg_match( '~rel=.(preconnect|dns-prefetch).[^>]*(gstatic|googleapis|fontawesome|bootstrapcdn|jsdelivr)~i', $html ) );
 check( 'dns-prefetch for cdnjs, which is still in use, is kept', (bool) preg_match( '~dns-prefetch[^>]*//cdnjs\.cloudflare\.com~', $html ) );
-check( 'no integrity attribute on localized files', ! preg_match( '~wp-dsgvo-fonts[^>]*integrity~', $html ) );
+check( 'no integrity attribute on localized files', ! preg_match( '~dsgvo-fonts[^>]*integrity~', $html ) );
 check( 'kit replaced by local Font Awesome Free', strpos( $html, 'wpdf-fa-kit-0-css' ) !== false );
 check( 'Web Font Loader uses the custom module', strpos( $html, 'custom:{families:["Lato","Oswald"]' ) !== false );
-check( 'JSON-escaped URL replaced', strpos( $html, '"fontUrl":"\/wp-content\/uploads\/wp-dsgvo-fonts' ) !== false );
+check( 'JSON-escaped URL replaced', strpos( $html, '"fontUrl":"\/wp-content\/uploads\/dsgvo-fonts' ) !== false );
 check( 'JS guard included', strpos( $html, 'id="wpdf-guard"' ) !== false );
 check( 'jQuery from cdnjs stays untouched', strpos( $html, 'cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1' ) !== false );
 check( 'documentation link to fontawesome.com stays', strpos( $html, 'https://fontawesome.com/icons' ) !== false );
 check( 'no blocked (failed) embeddings', strpos( $without_js, 'data:,' ) === false );
-check( 'local stylesheet copy with @import served', strpos( $html, '/wp-dsgvo-fonts/local-css/' ) !== false );
+check( 'local stylesheet copy with @import served', strpos( $html, '/dsgvo-fonts/local-css/' ) !== false );
 
 echo "Local files:\n";
-preg_match_all( '~/wp-content/uploads/wp-dsgvo-fonts/[^"\'\s)\\\\?#]+~', $html, $m );
+preg_match_all( '~/wp-content/uploads/dsgvo-fonts/[^"\'\s)\\\\?#]+~', $html, $m );
 $queue = array_unique( $m[0] );
 $seen  = [];
 check( count( $queue ) . ' local files referenced in the HTML', count( $queue ) >= 8 );

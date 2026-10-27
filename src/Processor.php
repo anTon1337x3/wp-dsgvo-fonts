@@ -39,6 +39,7 @@ class Processor {
 	}
 
 	public function should_process() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only debug switch, nothing is changed.
 		if ( isset( $_GET['nowpdf'] ) || is_admin() || wp_doing_ajax() || wp_doing_cron() || is_feed() ) {
 			return false;
 		}
@@ -48,6 +49,7 @@ class Processor {
 		}
 
 		foreach ( self::BUILDER_PREVIEWS as $param ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only detects a page builder preview.
 			if ( isset( $_GET[ $param ] ) ) {
 				return false;
 			}
@@ -74,7 +76,8 @@ class Processor {
 		try {
 			$html = $this->process( $html );
 		} catch ( \Throwable $e ) {
-			error_log( 'WP DSGVO Fonts: ' . $e->getMessage() );
+			// Shown under Settings → DSGVO Fonts.
+			Localizer::instance()->log_error( home_url( add_query_arg( [] ) ), $e->getMessage() );
 		}
 
 		Localizer::instance()->save();
@@ -174,6 +177,8 @@ class Processor {
 				$links = '';
 
 				foreach ( Localizer::instance()->kit_stylesheets( $src ) as $i => $url ) {
+					// The kit <script> is replaced inside the buffered HTML, where enqueueing is no longer possible.
+					// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
 					$links .= sprintf( '<link rel="stylesheet" id="wpdf-fa-kit-%d-css" href="%s" media="all" />', $i, esc_url( $url ) );
 				}
 

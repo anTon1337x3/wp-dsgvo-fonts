@@ -7,17 +7,27 @@ defined( 'ABSPATH' ) || exit;
 class Settings {
 	const OPTION = 'wpdf_settings';
 
-	const SUBSETS = [
-		'latin'        => 'Latin',
-		'latin-ext'    => 'Latin Extended (z. B. ő, ł, ş)',
-		'cyrillic'     => 'Kyrillisch',
-		'cyrillic-ext' => 'Kyrillisch Extended',
-		'greek'        => 'Griechisch',
-		'greek-ext'    => 'Griechisch Extended',
-		'vietnamese'   => 'Vietnamesisch',
-		'math'         => 'Mathematische Zeichen',
-		'symbols'      => 'Symbole',
-	];
+	/**
+	 * Subset names as Google Fonts labels them in its stylesheets.
+	 */
+	const SUBSETS = [ 'latin', 'latin-ext', 'cyrillic', 'cyrillic-ext', 'greek', 'greek-ext', 'vietnamese', 'math', 'symbols' ];
+
+	public static function subset_labels() {
+		return array_combine(
+			self::SUBSETS,
+			[
+				__( 'Latin', 'dsgvo-fonts' ),
+				__( 'Latin Extended (e.g. ő, ł, ş)', 'dsgvo-fonts' ),
+				__( 'Cyrillic', 'dsgvo-fonts' ),
+				__( 'Cyrillic Extended', 'dsgvo-fonts' ),
+				__( 'Greek', 'dsgvo-fonts' ),
+				__( 'Greek Extended', 'dsgvo-fonts' ),
+				__( 'Vietnamese', 'dsgvo-fonts' ),
+				__( 'Math symbols', 'dsgvo-fonts' ),
+				__( 'Symbols', 'dsgvo-fonts' ),
+			]
+		);
+	}
 
 	const FONT_DISPLAY = [ 'swap', 'fallback', 'optional', 'block', 'auto', 'keep' ];
 
@@ -54,7 +64,7 @@ class Settings {
 	public static function sanitize( $input ) {
 		$input   = is_array( $input ) ? $input : [];
 		$clean   = [];
-		$subsets = array_intersect( (array) ( $input['subsets'] ?? [] ), array_keys( self::SUBSETS ) );
+		$subsets = array_intersect( (array) ( $input['subsets'] ?? [] ), self::SUBSETS );
 
 		foreach ( [ 'google', 'fontawesome', 'local_css', 'js_guard', 'fa_kit_shims' ] as $flag ) {
 			$clean[ $flag ] = empty( $input[ $flag ] ) ? 0 : 1;

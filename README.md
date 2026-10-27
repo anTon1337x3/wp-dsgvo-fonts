@@ -1,6 +1,6 @@
-# WP DSGVO Fonts
+# DSGVO Fonts
 
-WordPress plugin that automatically self-hosts **Google Fonts** and **Font Awesome** and prevents every request to Google's and Font Awesome's servers. Visitors no longer connect to `fonts.googleapis.com`, `fonts.gstatic.com`, `use.fontawesome.com`, `kit.fontawesome.com` and the like: no IP address is transmitted and no cookie is set. This makes the site compliant with the GDPR (DSGVO) rulings of German courts on Google Fonts.
+WordPress plugin that automatically self-hosts **Google Fonts** and **Font Awesome** and prevents every request to Google's and Font Awesome's servers. Visitors no longer connect to `fonts.googleapis.com`, `fonts.gstatic.com`, `use.fontawesome.com`, `kit.fontawesome.com` and the like: no IP address is transmitted and no cookie is set. This addresses the German court rulings on Google Fonts and the GDPR (DSGVO); the plugin is a technical tool and doesn't guarantee legal compliance.
 
 ## How it works
 
@@ -17,15 +17,15 @@ The plugin buffers the HTML output of every frontend page (including the login p
 | `preconnect` / `dns-prefetch` to Google / Font Awesome | Removed, as are hints for CDNs that are no longer used afterwards |
 | Fonts injected by JavaScript (sliders, widgets, Divi sticky elements, Google Maps …) | Blocked in the browser (JS guard, can be disabled): via `href`/`src`, `setAttribute`, `appendChild`/`append` & co. (e.g. jQuery `.append('<link …>')`), `innerHTML`, `insertAdjacentHTML` and `document.write` |
 
-Files are downloaded once on the first page view; afterwards everything is served from `wp-content/uploads/wp-dsgvo-fonts/` (subfolders `google-fonts/` and `font-awesome/`). The providers' host names appear neither in the local paths nor in the JS guard, so GDPR scanners that search the page source for `fonts.googleapis.com` don't raise false alarms.
+Files are downloaded once on the first page view; afterwards everything is served from `wp-content/uploads/dsgvo-fonts/` (subfolders `google-fonts/` and `font-awesome/`). The providers' host names appear neither in the local paths nor in the JS guard, so GDPR scanners that search the page source for `fonts.googleapis.com` don't raise false alarms.
 
 If a file can't be downloaded, the embedding is blocked (fallback font instead of a data leak) and retried after 15 minutes.
 
 ## Installation
 
-1. Copy the `wp-dsgvo-fonts` folder to `wp-content/plugins/` (or upload it as a ZIP).
+1. Copy the `dsgvo-fonts` folder to `wp-content/plugins/` (or upload it as a ZIP).
 2. Activate the plugin. **Deactivate OMGF / OMGF Pro** so the two plugins don't interfere.
-3. Under **Settings → DSGVO Fonts**, use "Seite prüfen" (check page) to verify that no references are left.
+3. Under **Settings → DSGVO Fonts**, use "Check page" to verify that no references are left.
 4. Clear the page cache (WP Rocket, W3TC, LiteSpeed, WP Super Cache, Autoptimize and others are purged automatically).
 
 ## Settings
@@ -37,7 +37,7 @@ If a file can't be downloaded, the embedding is blocked (fallback font instead o
 - JavaScript guard against injected fonts
 - Font Awesome version for kits (default: detected automatically, fallback 6.7.2) and v4 compatibility
 
-The font cache is cleared automatically when the settings are saved. The admin UI is in German.
+The font cache is cleared automatically when the settings are saved. The admin UI is in English, with a German translation in `languages/`.
 
 ## WP-CLI
 
@@ -66,6 +66,14 @@ End-to-end test with Docker (WordPress + MariaDB + a fixture page that uses ever
 tests/e2e/run.sh        # the site keeps running on http://localhost:8089 (admin / admin)
 tests/e2e/run.sh down   # clean up
 ```
+
+## Release
+
+```bash
+bin/build-zip.sh   # builds dist/dsgvo-fonts.zip (compiles translations, leaves out everything in .distignore)
+```
+
+The WordPress.org listing is described in `readme.txt`. To update translations after changing strings, regenerate `languages/dsgvo-fonts.pot` with `wp i18n make-pot . languages/dsgvo-fonts.pot --exclude=tests,bin,dist` and update `languages/dsgvo-fonts-de_DE.po`.
 
 ## License
 

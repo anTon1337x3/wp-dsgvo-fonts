@@ -5,15 +5,24 @@ namespace WPDsgvoFonts;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Local copies live in wp-content/uploads/wp-dsgvo-fonts/{folder}/{path}.
+ * Local copies live in wp-content/uploads/dsgvo-fonts/{folder}/{path}.
  */
 class Storage {
-	const DIR = 'wp-dsgvo-fonts';
+	const DIR = 'dsgvo-fonts';
+
+	/**
+	 * Folder used before the plugin was renamed from "WP DSGVO Fonts".
+	 */
+	const LEGACY_DIR = 'wp-dsgvo-fonts';
 
 	/**
 	 * Bumped whenever path_for() changes, so copies stored under the old layout get replaced.
 	 */
-	const LAYOUT = 2;
+	const LAYOUT = 3;
+
+	// The host names below are what this plugin looks for in order to replace them with local copies; nothing is
+	// loaded from these hosts in the browser.
+	// phpcs:disable PluginCheck.CodeAnalysis.Offloading.OffloadedContent
 
 	/**
 	 * Neutral folder names: GDPR scanners search the page source for the third-party host names, and a local URL
@@ -30,6 +39,8 @@ class Storage {
 		'stackpath.bootstrapcdn.com' => 'font-awesome/bootstrapcdn',
 		'netdna.bootstrapcdn.com'    => 'font-awesome/bootstrapcdn',
 	];
+
+	// phpcs:enable PluginCheck.CodeAnalysis.Offloading.OffloadedContent
 
 	const EXTENSIONS = [ 'css', 'js', 'woff2', 'woff', 'ttf', 'otf', 'eot', 'svg' ];
 
@@ -152,14 +163,23 @@ class Storage {
 	}
 
 	public static function flush() {
-		foreach ( self::iterate() as $file ) {
-			$file->isDir() ? rmdir( $file->getPathname() ) : unlink( $file->getPathname() );
-		}
+		self::delete_dir( self::base_dir() );
+		self::delete_dir( trailingslashit( wp_get_upload_dir()['basedir'] ) . self::LEGACY_DIR );
 	}
 
-	/**
-	 * Children before parents, so directories can be removed after their contents.
-	 */
+	private static function delete_dir( $dir ) {
+		if ( ! is_dir( $dir ) ) {
+			return;
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+
+		// Always the direct method: these are our own files in the uploads folder, and flushing also runs on
+		// frontend requests where no FTP credentials could be asked for.
+		( new \WP_Filesystem_Direct( null ) )->rmdir( $dir, true );
+	}
+
 	private static function iterate() {
 		$dir = self::base_dir();
 

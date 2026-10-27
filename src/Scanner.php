@@ -24,7 +24,8 @@ class Scanner {
 			[
 				'timeout'     => 90,
 				'redirection' => 3,
-				'sslverify'   => apply_filters( 'https_local_ssl_verify', false ),
+				// Core filter for loopback requests, as used by WordPress itself.
+				'sslverify'   => apply_filters( 'https_local_ssl_verify', false ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				'headers'     => [ 'Cache-Control' => 'no-cache' ],
 			]
 		);

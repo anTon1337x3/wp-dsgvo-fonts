@@ -111,7 +111,7 @@ class Localizer {
 		$rel = Storage::path_for( $url, $response['type'] );
 
 		if ( ! $rel ) {
-			return new \WP_Error( 'wpdf_type', 'Unbekannter Dateityp' );
+			return new \WP_Error( 'wpdf_type', __( 'Unknown file type', 'dsgvo-fonts' ) );
 		}
 
 		$body = $response['body'];
@@ -129,7 +129,8 @@ class Localizer {
 		}
 
 		if ( ! Storage::write( $rel, $body ) ) {
-			return new \WP_Error( 'wpdf_write', 'Datei konnte nicht gespeichert werden: ' . $rel );
+			/* translators: %s: file path */
+			return new \WP_Error( 'wpdf_write', sprintf( __( 'File could not be saved: %s', 'dsgvo-fonts' ), $rel ) );
 		}
 
 		return $rel;
@@ -140,7 +141,7 @@ class Localizer {
 	 */
 	private function prepare_google_css( $css ) {
 		if ( stripos( $css, '@font-face' ) === false ) {
-			return new \WP_Error( 'wpdf_google_css', 'Keine @font-face-Regeln in der Antwort von Google' );
+			return new \WP_Error( 'wpdf_google_css', __( 'No @font-face rules in the response from Google', 'dsgvo-fonts' ) );
 		}
 
 		$allowed  = (array) Settings::get( 'subsets' );
@@ -150,7 +151,7 @@ class Localizer {
 				$subset = $match[1] ?? '';
 
 				// Unlabeled blocks and numbered slices (e.g. [12] for CJK fonts) are always kept.
-				if ( ! isset( Settings::SUBSETS[ $subset ] ) || in_array( $subset, $allowed, true ) ) {
+				if ( ! in_array( $subset, Settings::SUBSETS, true ) || in_array( $subset, $allowed, true ) ) {
 					return $match[0];
 				}
 
@@ -251,7 +252,8 @@ class Localizer {
 			$version = $this->map[ $kit_url ]['version'];
 		}
 
-		$base  = 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@' . $version . '/css/';
+		// Downloaded server-side and served locally, like every other file.
+		$base  = 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@' . $version . '/css/'; // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent
 		$files = Settings::get( 'fa_kit_shims' ) ? [ 'all.min.css', 'v4-shims.min.css' ] : [ 'all.min.css' ];
 		$urls  = [];
 
@@ -270,13 +272,17 @@ class Localizer {
 		$response = Downloader::fetch( $kit_url );
 
 		if ( is_wp_error( $response ) ) {
-			$this->log_error( $kit_url, 'Kit-Version nicht ermittelbar (' . $response->get_error_message() . '), verwende Font Awesome Free ' . Settings::FA_FALLBACK_VERSION );
+			$this->log_error(
+				$kit_url,
+				/* translators: 1: error message, 2: Font Awesome version number */
+				sprintf( __( 'Kit version could not be detected (%1$s), using Font Awesome Free %2$s', 'dsgvo-fonts' ), $response->get_error_message(), Settings::FA_FALLBACK_VERSION )
+			);
 
 			return Settings::FA_FALLBACK_VERSION;
 		}
 
 		if ( preg_match( '~"license"\s*:\s*"pro"~i', $response['body'] ) ) {
-			$this->log_error( $kit_url, 'Pro-Kit erkannt: lokal wird Font Awesome Free bereitgestellt, Pro-Icons fehlen.' );
+			$this->log_error( $kit_url, __( 'Pro kit detected: Font Awesome Free is provided locally, Pro icons are missing.', 'dsgvo-fonts' ) );
 		}
 
 		if ( preg_match( '~"version"\s*:\s*"(\d+\.\d+\.\d+)"~', $response['body'], $match ) ) {
@@ -334,7 +340,7 @@ class Localizer {
 				$rel = 'local-css/' . md5( $path ) . '.css';
 				Storage::ensure_dir();
 
-				if ( ! Storage::write( $rel, "/* Kopie von " . Hosts::shorten( $absolute ) . " (WP DSGVO Fonts) */\n" . $rewritten ) ) {
+				if ( ! Storage::write( $rel, "/* Copy of " . Hosts::shorten( $absolute ) . " (DSGVO Fonts) */\n" . $rewritten ) ) {
 					return null;
 				}
 			}
@@ -423,7 +429,7 @@ class Localizer {
 		return isset( $this->errors[ $url ] ) && time() - $this->errors[ $url ]['time'] < self::RETRY_AFTER;
 	}
 
-	private function log_error( $url, $message ) {
+	public function log_error( $url, $message ) {
 		$this->load_errors();
 		unset( $this->errors[ $url ] );
 

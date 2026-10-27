@@ -5,7 +5,7 @@ namespace WPDsgvoFonts;
 defined( 'ABSPATH' ) || exit;
 
 class Admin {
-	const PAGE = 'wp-dsgvo-fonts';
+	const PAGE = 'dsgvo-fonts';
 
 	const CONFLICTING_PLUGINS = [
 		'host-webfonts-local/host-webfonts-local.php' => 'OMGF',
@@ -33,7 +33,7 @@ class Admin {
 	}
 
 	public function action_links( $links ) {
-		array_unshift( $links, sprintf( '<a href="%s">Einstellungen</a>', esc_url( $this->page_url() ) ) );
+		array_unshift( $links, sprintf( '<a href="%s">%s</a>', esc_url( $this->page_url() ), esc_html__( 'Settings', 'dsgvo-fonts' ) ) );
 
 		return $links;
 	}
@@ -50,9 +50,14 @@ class Admin {
 		foreach ( self::CONFLICTING_PLUGINS as $file => $name ) {
 			if ( is_plugin_active( $file ) ) {
 				printf(
-					'<div class="notice notice-warning"><p><strong>WP DSGVO Fonts:</strong> %s ist ebenfalls aktiv. Bitte deaktiviere %s, damit sich die beiden Plugins nicht gegenseitig in die Quere kommen.</p></div>',
-					esc_html( $name ),
-					esc_html( $name )
+					'<div class="notice notice-warning"><p><strong>DSGVO Fonts:</strong> %s</p></div>',
+					esc_html(
+						sprintf(
+							/* translators: %s: name of another font plugin, e.g. OMGF */
+							__( '%s is active as well. Please deactivate it, so the two plugins don\'t interfere with each other.', 'dsgvo-fonts' ),
+							$name
+						)
+					)
 				);
 			}
 		}
@@ -62,7 +67,7 @@ class Admin {
 		check_admin_referer( 'wpdf_flush' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( 'Keine Berechtigung.' );
+			wp_die( esc_html__( 'You are not allowed to do this.', 'dsgvo-fonts' ) );
 		}
 
 		Cache::flush_all();
@@ -75,7 +80,7 @@ class Admin {
 		check_admin_referer( 'wpdf_scan' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( 'Keine Berechtigung.' );
+			wp_die( esc_html__( 'You are not allowed to do this.', 'dsgvo-fonts' ) );
 		}
 
 		$url = esc_url_raw( wp_unslash( $_POST['wpdf_scan_url'] ?? '' ) );
@@ -100,28 +105,31 @@ class Admin {
 		$errors   = Localizer::instance()->errors();
 		$stats    = Storage::stats();
 		$scan     = get_transient( 'wpdf_scan_' . get_current_user_id() );
-		$notice   = sanitize_key( $_GET['wpdf_notice'] ?? '' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only selects which notice to show.
+		$notice = sanitize_key( wp_unslash( $_GET['wpdf_notice'] ?? '' ) );
+		$name   = Settings::OPTION;
 		?>
 		<div class="wrap">
-			<h1>WP DSGVO Fonts</h1>
-			<p>Google Fonts und Font Awesome werden beim ersten Seitenaufruf vom Server heruntergeladen und anschließend lokal ausgeliefert. Besucher stellen keine Verbindung zu Google oder Font Awesome her.</p>
+			<h1>DSGVO Fonts</h1>
+			<p><?php esc_html_e( 'Google Fonts and Font Awesome are downloaded by your server on the first page view and served locally afterwards. Visitors\' browsers don\'t connect to Google or Font Awesome.', 'dsgvo-fonts' ); ?></p>
 
 			<?php if ( $notice === 'flushed' ) : ?>
-				<div class="notice notice-success is-dismissible"><p>Der Cache wurde geleert. Fonts werden beim nächsten Seitenaufruf neu heruntergeladen.</p></div>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'The cache was cleared. Fonts are downloaded again on the next page view.', 'dsgvo-fonts' ); ?></p></div>
 			<?php elseif ( $notice === 'scanned' ) : ?>
-				<div class="notice notice-success is-dismissible"><p>Die Seitenprüfung ist abgeschlossen.</p></div>
-			<?php elseif ( isset( $_GET['settings-updated'] ) ) : ?>
-				<div class="notice notice-success is-dismissible"><p>Einstellungen gespeichert. Der Font-Cache wurde geleert.</p></div>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'The page check is complete.', 'dsgvo-fonts' ); ?></p></div>
+			<?php elseif ( isset( $_GET['settings-updated'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Set by options.php. ?>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved. The font cache was cleared.', 'dsgvo-fonts' ); ?></p></div>
 			<?php endif; ?>
 
-			<h2>Status</h2>
+			<h2><?php esc_html_e( 'Status', 'dsgvo-fonts' ); ?></h2>
 			<p>
 				<?php
 				printf(
-					'%d lokale Dateien (%s) in <code>%s</code>',
+					/* translators: 1: number of files, 2: total size, 3: folder */
+					esc_html( _n( '%1$d local file (%2$s) in %3$s', '%1$d local files (%2$s) in %3$s', (int) $stats['files'], 'dsgvo-fonts' ) ),
 					(int) $stats['files'],
-					esc_html( size_format( $stats['bytes'] ) ?: '0 B' ),
-					esc_html( Storage::base_url() )
+					esc_html( size_format( $stats['bytes'] ) ? size_format( $stats['bytes'] ) : '0 B' ),
+					'<code>' . esc_html( Storage::base_url() ) . '</code>'
 				);
 				?>
 			</p>
@@ -131,38 +139,37 @@ class Admin {
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="wpdf_flush" />
 				<?php wp_nonce_field( 'wpdf_flush' ); ?>
-				<?php submit_button( 'Cache leeren', 'secondary', 'submit', false ); ?>
+				<?php submit_button( __( 'Clear cache', 'dsgvo-fonts' ), 'secondary', 'submit', false ); ?>
 			</form>
 
-			<h2 id="wpdf-scan">Seite prüfen</h2>
-			<p>Ruft eine Seite wie ein nicht angemeldeter Besucher ab und listet alle verbliebenen Verweise auf Google Fonts oder Font Awesome im HTML und in den eingebundenen CSS-Dateien.</p>
+			<h2 id="wpdf-scan"><?php esc_html_e( 'Check page', 'dsgvo-fonts' ); ?></h2>
+			<p><?php esc_html_e( 'Loads a page like a visitor who isn\'t logged in and lists all remaining references to Google Fonts or Font Awesome in its HTML and stylesheets.', 'dsgvo-fonts' ); ?></p>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="wpdf_scan" />
 				<?php wp_nonce_field( 'wpdf_scan' ); ?>
 				<input type="url" name="wpdf_scan_url" class="regular-text" value="<?php echo esc_attr( $scan['url'] ?? home_url( '/' ) ); ?>" />
-				<?php submit_button( 'Prüfen', 'primary', 'submit', false ); ?>
+				<?php submit_button( __( 'Check', 'dsgvo-fonts' ), 'primary', 'submit', false ); ?>
 			</form>
 			<?php $this->render_scan( $scan ); ?>
 
-			<h2>Einstellungen</h2>
+			<h2><?php esc_html_e( 'Settings', 'dsgvo-fonts' ); ?></h2>
 			<form method="post" action="options.php">
 				<?php settings_fields( self::PAGE ); ?>
-				<?php $name = Settings::OPTION; ?>
 				<table class="form-table" role="presentation">
 					<tr>
-						<th scope="row">Dienste</th>
+						<th scope="row"><?php esc_html_e( 'Services', 'dsgvo-fonts' ); ?></th>
 						<td>
-							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[google]" value="1" <?php checked( $settings['google'] ); ?> /> Google Fonts lokal hosten</label><br />
-							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[fontawesome]" value="1" <?php checked( $settings['fontawesome'] ); ?> /> Font Awesome lokal hosten</label>
+							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[google]" value="1" <?php checked( $settings['google'] ); ?> /> <?php esc_html_e( 'Self-host Google Fonts', 'dsgvo-fonts' ); ?></label><br />
+							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[fontawesome]" value="1" <?php checked( $settings['fontawesome'] ); ?> /> <?php esc_html_e( 'Self-host Font Awesome', 'dsgvo-fonts' ); ?></label>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row">Zeichensätze (Google Fonts)</th>
+						<th scope="row"><?php esc_html_e( 'Subsets (Google Fonts)', 'dsgvo-fonts' ); ?></th>
 						<td>
-							<?php foreach ( Settings::SUBSETS as $subset => $label ) : ?>
+							<?php foreach ( Settings::subset_labels() as $subset => $label ) : ?>
 								<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[subsets][]" value="<?php echo esc_attr( $subset ); ?>" <?php checked( in_array( $subset, $settings['subsets'], true ) ); ?> /> <?php echo esc_html( $label ); ?></label><br />
 							<?php endforeach; ?>
-							<p class="description">Bietet eine Schrift keinen der gewählten Zeichensätze an, werden alle ihre Dateien geladen.</p>
+							<p class="description"><?php esc_html_e( 'If a font offers none of the selected subsets, all of its files are loaded.', 'dsgvo-fonts' ); ?></p>
 						</td>
 					</tr>
 					<tr>
@@ -170,35 +177,43 @@ class Admin {
 						<td>
 							<select id="wpdf-font-display" name="<?php echo esc_attr( $name ); ?>[font_display]">
 								<?php foreach ( Settings::FONT_DISPLAY as $value ) : ?>
-									<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $settings['font_display'], $value ); ?>><?php echo esc_html( $value === 'keep' ? 'Nicht ändern' : $value ); ?></option>
+									<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $settings['font_display'], $value ); ?>><?php echo esc_html( $value === 'keep' ? __( 'Don\'t change', 'dsgvo-fonts' ) : $value ); ?></option>
 								<?php endforeach; ?>
 							</select>
-							<p class="description">„swap“ zeigt Text sofort in einer Ersatzschrift an und verhindert unsichtbaren Text während des Ladens.</p>
+							<p class="description"><?php esc_html_e( '"swap" shows text immediately in a fallback font and prevents invisible text while fonts load.', 'dsgvo-fonts' ); ?></p>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row">Lokale CSS-Dateien</th>
+						<th scope="row"><?php esc_html_e( 'Local stylesheets', 'dsgvo-fonts' ); ?></th>
 						<td>
-							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[local_css]" value="1" <?php checked( $settings['local_css'] ); ?> /> CSS-Dateien von Theme und Plugins nach <code>@import</code> von Google Fonts / Font Awesome durchsuchen und bereinigte Kopien ausliefern</label>
+							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[local_css]" value="1" <?php checked( $settings['local_css'] ); ?> /> <?php esc_html_e( 'Search theme and plugin stylesheets for imports of Google Fonts / Font Awesome and serve cleaned copies', 'dsgvo-fonts' ); ?></label>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row">JavaScript-Schutz</th>
+						<th scope="row"><?php esc_html_e( 'JavaScript guard', 'dsgvo-fonts' ); ?></th>
 						<td>
-							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[js_guard]" value="1" <?php checked( $settings['js_guard'] ); ?> /> Per JavaScript nachgeladene Google-Fonts- und Font-Awesome-Dateien blockieren</label>
-							<p class="description">Greift z. B. bei Slidern oder Widgets, die Schriften erst im Browser einfügen. Diese Elemente zeigen dann die Ersatzschrift.</p>
+							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[js_guard]" value="1" <?php checked( $settings['js_guard'] ); ?> /> <?php esc_html_e( 'Block Google Fonts and Font Awesome files that are added by JavaScript', 'dsgvo-fonts' ); ?></label>
+							<p class="description"><?php esc_html_e( 'Applies e.g. to sliders or widgets that add fonts in the browser. These elements then show the fallback font.', 'dsgvo-fonts' ); ?></p>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="wpdf-kit-version">Font Awesome Kits</label></th>
+						<th scope="row"><label for="wpdf-kit-version"><?php esc_html_e( 'Font Awesome Kits', 'dsgvo-fonts' ); ?></label></th>
 						<td>
 							<input id="wpdf-kit-version" type="text" class="small-text" name="<?php echo esc_attr( $name ); ?>[fa_kit_version]" value="<?php echo esc_attr( $settings['fa_kit_version'] ); ?>" placeholder="auto" />
-							<p class="description">Kits (<code>kit.fontawesome.com/….js</code>) werden durch eine lokale Font Awesome Free ersetzt. Leer lassen, um die Version des Kits zu übernehmen (Ersatz: <?php echo esc_html( Settings::FA_FALLBACK_VERSION ); ?>). Pro-Icons und eigene Kit-Icons sind nicht enthalten.</p>
-							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[fa_kit_shims]" value="1" <?php checked( $settings['fa_kit_shims'] ); ?> /> Kompatibilität für Font-Awesome-4-Klassen (<code>fa fa-…</code>) mitladen</label>
+							<p class="description">
+								<?php
+								printf(
+									/* translators: %s: Font Awesome version number */
+									esc_html__( 'Font Awesome Kits (kit scripts) are replaced by a local copy of Font Awesome Free. Leave empty to use the kit\'s version (fallback: %s). Pro icons and custom kit icons are not included.', 'dsgvo-fonts' ),
+									esc_html( Settings::FA_FALLBACK_VERSION )
+								);
+								?>
+							</p>
+							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[fa_kit_shims]" value="1" <?php checked( $settings['fa_kit_shims'] ); ?> /> <?php esc_html_e( 'Also load compatibility for Font Awesome 4 classes (fa fa-…)', 'dsgvo-fonts' ); ?></label>
 						</td>
 					</tr>
 				</table>
-				<?php submit_button( 'Speichern und Cache leeren' ); ?>
+				<?php submit_button( __( 'Save and clear cache', 'dsgvo-fonts' ) ); ?>
 			</form>
 		</div>
 		<?php
@@ -213,7 +228,7 @@ class Admin {
 		);
 
 		if ( ! $rows ) {
-			echo '<p><em>Noch keine Dateien lokalisiert. Rufe eine Seite auf oder nutze „Seite prüfen“.</em></p>';
+			echo '<p><em>' . esc_html__( 'No files localized yet. Visit a page or use "Check page".', 'dsgvo-fonts' ) . '</em></p>';
 
 			return;
 		}
@@ -221,13 +236,25 @@ class Admin {
 		$labels = [
 			'google'      => 'Google Fonts',
 			'fontawesome' => 'Font Awesome',
-			'local'       => 'Lokale CSS-Kopie',
+			'local'       => __( 'Local stylesheet copy', 'dsgvo-fonts' ),
 		];
 		?>
 		<details>
-			<summary><?php echo esc_html( sprintf( '%d lokalisierte Quellen anzeigen', count( $rows ) ) ); ?></summary>
+			<summary>
+				<?php
+				/* translators: %d: number of localized sources */
+				echo esc_html( sprintf( _n( 'Show %d localized source', 'Show %d localized sources', count( $rows ), 'dsgvo-fonts' ), count( $rows ) ) );
+				?>
+			</summary>
 			<table class="widefat striped" style="margin-top:8px">
-				<thead><tr><th>Typ</th><th>Quelle</th><th>Lokale Datei</th><th>Datum</th></tr></thead>
+				<thead>
+					<tr>
+						<th><?php esc_html_e( 'Type', 'dsgvo-fonts' ); ?></th>
+						<th><?php esc_html_e( 'Source', 'dsgvo-fonts' ); ?></th>
+						<th><?php esc_html_e( 'Local file', 'dsgvo-fonts' ); ?></th>
+						<th><?php esc_html_e( 'Date', 'dsgvo-fonts' ); ?></th>
+					</tr>
+				</thead>
 				<tbody>
 				<?php foreach ( $rows as $source => $entry ) : ?>
 					<tr>
@@ -240,7 +267,7 @@ class Admin {
 								<code><?php echo esc_html( $entry['file'] ); ?></code>
 							<?php endif; ?>
 						</td>
-						<td><?php echo esc_html( wp_date( get_option( 'date_format' ) . ' H:i', $entry['time'] ) ); ?></td>
+						<td><?php echo esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $entry['time'] ) ); ?></td>
 					</tr>
 				<?php endforeach; ?>
 				</tbody>
@@ -255,10 +282,16 @@ class Admin {
 		}
 		?>
 		<div class="notice notice-warning inline">
-			<p><strong>Hinweise und Fehler:</strong> Nicht ladbare Dateien werden blockiert (die Seite nutzt dann die Ersatzschrift) und nach <?php echo (int) ( Localizer::RETRY_AFTER / MINUTE_IN_SECONDS ); ?> Minuten erneut versucht.</p>
+			<p>
+				<strong><?php esc_html_e( 'Notices and errors:', 'dsgvo-fonts' ); ?></strong>
+				<?php
+				/* translators: %d: minutes */
+				echo esc_html( sprintf( __( 'Files that can\'t be downloaded are blocked (the page uses the fallback font) and retried after %d minutes.', 'dsgvo-fonts' ), (int) ( Localizer::RETRY_AFTER / MINUTE_IN_SECONDS ) ) );
+				?>
+			</p>
 			<ul>
 				<?php foreach ( array_reverse( $errors, true ) as $url => $error ) : ?>
-					<li><code style="word-break:break-all"><?php echo esc_html( $url ); ?></code>: <?php echo esc_html( $error['message'] ); ?> (<?php echo esc_html( wp_date( 'd.m.Y H:i', $error['time'] ) ); ?>)</li>
+					<li><code style="word-break:break-all"><?php echo esc_html( $url ); ?></code>: <?php echo esc_html( $error['message'] ); ?> (<?php echo esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $error['time'] ) ); ?>)</li>
 				<?php endforeach; ?>
 			</ul>
 		</div>
@@ -270,28 +303,44 @@ class Admin {
 			return;
 		}
 
-		printf( '<p>Ergebnis für <a href="%1$s" target="_blank" rel="noopener">%1$s</a> vom %2$s:</p>', esc_url( $scan['url'] ), esc_html( wp_date( 'd.m.Y H:i', $scan['time'] ) ) );
+		printf(
+			'<p>%s</p>',
+			sprintf(
+				/* translators: 1: checked URL, 2: date and time */
+				esc_html__( 'Result for %1$s from %2$s:', 'dsgvo-fonts' ),
+				sprintf( '<a href="%1$s" target="_blank" rel="noopener">%1$s</a>', esc_url( $scan['url'] ) ),
+				esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $scan['time'] ) )
+			)
+		);
 
 		if ( ! empty( $scan['error'] ) ) {
-			printf( '<div class="notice notice-error inline"><p>Die Seite konnte nicht geprüft werden: %s</p></div>', esc_html( $scan['error'] ) );
+			/* translators: %s: error message */
+			printf( '<div class="notice notice-error inline"><p>%s</p></div>', esc_html( sprintf( __( 'The page could not be checked: %s', 'dsgvo-fonts' ), $scan['error'] ) ) );
 
 			return;
 		}
 
 		if ( ! $scan['findings'] ) {
-			echo '<div class="notice notice-success inline"><p>✅ Keine Verweise auf Google Fonts oder Font Awesome gefunden.</p></div>';
+			echo '<div class="notice notice-success inline"><p>✅ ' . esc_html__( 'No references to Google Fonts or Font Awesome found.', 'dsgvo-fonts' ) . '</p></div>';
 
 			return;
 		}
 		?>
 		<div class="notice notice-error inline">
-			<p><strong><?php echo esc_html( sprintf( '%d verbliebene Verweise gefunden:', count( $scan['findings'] ) ) ); ?></strong></p>
+			<p>
+				<strong>
+					<?php
+					/* translators: %d: number of references */
+					echo esc_html( sprintf( _n( '%d remaining reference found:', '%d remaining references found:', count( $scan['findings'] ), 'dsgvo-fonts' ), count( $scan['findings'] ) ) );
+					?>
+				</strong>
+			</p>
 			<ul>
 				<?php foreach ( $scan['findings'] as $finding ) : ?>
-					<li><code style="word-break:break-all"><?php echo esc_html( $finding['url'] ); ?></code> in <?php echo esc_html( $finding['where'] ); ?></li>
+					<li><code style="word-break:break-all"><?php echo esc_html( $finding['url'] ); ?></code> – <?php echo esc_html( $finding['where'] ); ?></li>
 				<?php endforeach; ?>
 			</ul>
-			<p>Ist ein Dienst in den Einstellungen deaktiviert, bleiben seine Verweise bewusst erhalten. Bei aktivem Seiten-Cache diesen ggf. leeren und erneut prüfen.</p>
+			<p><?php esc_html_e( 'References of a service that is disabled in the settings are kept on purpose. If a page cache is active, clear it and check again.', 'dsgvo-fonts' ); ?></p>
 		</div>
 		<?php
 	}

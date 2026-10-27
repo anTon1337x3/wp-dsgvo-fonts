@@ -7,17 +7,15 @@ delete_option( 'wpdf_map' );
 delete_option( 'wpdf_errors' );
 delete_option( 'wpdf_layout' );
 
-$wpdf_dir = trailingslashit( wp_get_upload_dir()['basedir'] ) . 'wp-dsgvo-fonts';
+require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
 
-if ( is_dir( $wpdf_dir ) ) {
-	$wpdf_files = new RecursiveIteratorIterator(
-		new RecursiveDirectoryIterator( $wpdf_dir, FilesystemIterator::SKIP_DOTS ),
-		RecursiveIteratorIterator::CHILD_FIRST
-	);
+$wpdf_filesystem = new WP_Filesystem_Direct( null );
+$wpdf_uploads    = trailingslashit( wp_get_upload_dir()['basedir'] );
 
-	foreach ( $wpdf_files as $wpdf_file ) {
-		$wpdf_file->isDir() ? rmdir( $wpdf_file->getPathname() ) : unlink( $wpdf_file->getPathname() );
+// Current folder and the one used before the plugin was renamed from "WP DSGVO Fonts".
+foreach ( [ 'dsgvo-fonts', 'wp-dsgvo-fonts' ] as $wpdf_dir ) {
+	if ( is_dir( $wpdf_uploads . $wpdf_dir ) ) {
+		$wpdf_filesystem->rmdir( $wpdf_uploads . $wpdf_dir, true );
 	}
-
-	rmdir( $wpdf_dir );
 }
