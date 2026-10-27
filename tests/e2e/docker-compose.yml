@@ -1,0 +1,55 @@
+name: wpdf-e2e
+
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      interval: 3s
+      retries: 30
+
+  wordpress:
+    image: wordpress:php8.2-apache
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8089:8089"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp:/var/www/html
+      - ../..:/var/www/html/wp-content/plugins/wp-dsgvo-fonts:ro
+      - ./fixtures:/var/www/html/wp-content/mu-plugins:ro
+      # Same port inside and outside the container, so loopback requests (Seite prüfen) reach the site.
+      - ./apache-ports.conf:/etc/apache2/ports.conf:ro
+      - ./apache-vhost.conf:/etc/apache2/sites-enabled/000-default.conf:ro
+
+  cli:
+    image: wordpress:cli-php8.2
+    user: "33:33"
+    depends_on:
+      - wordpress
+    # Shares the WordPress container's localhost, so "wp dsgvo-fonts scan" can reach the site.
+    network_mode: "service:wordpress"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp:/var/www/html
+      - ../..:/var/www/html/wp-content/plugins/wp-dsgvo-fonts:ro
+      - ./fixtures:/var/www/html/wp-content/mu-plugins:ro
+    entrypoint: [ "wp" ]
+
+volumes:
+  wp:

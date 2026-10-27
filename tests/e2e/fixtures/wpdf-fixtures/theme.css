@@ -1,0 +1,5 @@
+@import url("parts/fonts.css");
+
+body {
+	background: #fafafa url(img/pattern.svg) repeat;
+}
