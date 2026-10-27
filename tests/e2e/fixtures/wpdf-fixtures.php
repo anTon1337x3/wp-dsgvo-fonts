@@ -32,6 +32,9 @@ add_action(
 
 		// Not related to fonts: must stay untouched.
 		wp_enqueue_script( 'jquery-cdnjs', 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js', [], null, false );
+
+		// Fonts inserted as HTML strings at runtime, like Divi's sticky elements do.
+		wp_enqueue_script( 'wpdf-dynamic', $dir . 'dynamic.js', [ 'jquery-cdnjs' ], '1', true );
 	}
 );
 

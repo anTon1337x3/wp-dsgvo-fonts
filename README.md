@@ -15,7 +15,7 @@ The plugin buffers the HTML output of every frontend page (including the login p
 | Inline `<style>@import …</style>`, URLs in JS / JSON (`https:\/\/fonts…`) | Replaced by local URLs |
 | Web Font Loader (`WebFont.load({google:{families:[…]}})`) | Switched to the `custom` module with a local stylesheet |
 | `preconnect` / `dns-prefetch` to Google / Font Awesome | Removed, as are hints for CDNs that are no longer used afterwards |
-| Fonts injected by JavaScript (sliders, widgets, Google Maps …) | Blocked in the browser (JS guard, can be disabled) |
+| Fonts injected by JavaScript (sliders, widgets, Divi sticky elements, Google Maps …) | Blocked in the browser (JS guard, can be disabled): via `href`/`src`, `setAttribute`, `appendChild`/`append` & co. (e.g. jQuery `.append('<link …>')`), `innerHTML`, `insertAdjacentHTML` and `document.write` |
 
 Files are downloaded once on the first page view; afterwards everything is served from `wp-content/uploads/wp-dsgvo-fonts/` (subfolders `google-fonts/` and `font-awesome/`). The providers' host names appear neither in the local paths nor in the JS guard, so GDPR scanners that search the page source for `fonts.googleapis.com` don't raise false alarms.
 

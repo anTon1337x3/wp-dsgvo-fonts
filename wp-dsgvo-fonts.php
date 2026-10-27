@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       WP DSGVO Fonts
  * Description:       Hostet Google Fonts und Font Awesome automatisch lokal und unterbindet alle Aufrufe an Google- und Font-Awesome-Server (DSGVO-konform).
- * Version:           1.0.1
+ * Version:           1.0.2
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            Anton Lapko
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WPDF_VERSION', '1.0.1' );
+define( 'WPDF_VERSION', '1.0.2' );
 define( 'WPDF_FILE', __FILE__ );
 define( 'WPDF_DIR', plugin_dir_path( __FILE__ ) );
 
