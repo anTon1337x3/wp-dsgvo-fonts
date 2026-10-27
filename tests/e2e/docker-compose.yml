@@ -29,7 +29,7 @@ services:
       - wp:/var/www/html
       - ../..:/var/www/html/wp-content/plugins/wp-dsgvo-fonts:ro
       - ./fixtures:/var/www/html/wp-content/mu-plugins:ro
-      # Same port inside and outside the container, so loopback requests (Seite prüfen) reach the site.
+      # Same port inside and outside the container, so loopback requests (page check) reach the site.
       - ./apache-ports.conf:/etc/apache2/ports.conf:ro
       - ./apache-vhost.conf:/etc/apache2/sites-enabled/000-default.conf:ro
 

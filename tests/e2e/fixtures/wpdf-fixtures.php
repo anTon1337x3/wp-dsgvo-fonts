@@ -74,10 +74,10 @@ add_action(
 			<p class="f-montserrat">Montserrat <i class="fa fa-home"></i> <i class="fas fa-user"></i> <i class="fa-solid fa-star"></i> <i class="fa-brands fa-github"></i></p>
 			<p class="f-roboto">Roboto <em>Italic 700</em></p>
 			<p class="f-lato">Lato (Web Font Loader)</p>
-			<p class="f-pacifico">Pacifico (Inline @import)</p>
-			<p class="f-nunito">Nunito (lokale CSS mit @import)</p>
-			<p class="f-dynamic" style="font-family:'Dancing Script'">Dancing Script (per JS nachgeladen, URL serverseitig lokalisiert)</p>
-			<p><a href="https://fontawesome.com/icons">Link zur Font-Awesome-Doku bleibt</a></p>
+			<p class="f-pacifico">Pacifico (inline @import)</p>
+			<p class="f-nunito">Nunito (local stylesheet with @import)</p>
+			<p class="f-dynamic" style="font-family:'Dancing Script'">Dancing Script (injected by JS, URL localized server-side)</p>
+			<p><a href="https://fontawesome.com/icons">Link to the Font Awesome docs stays</a></p>
 		</div>
 		<script>
 			window.addEventListener('load', function () {

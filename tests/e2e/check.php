@@ -28,26 +28,26 @@ $without_js = preg_replace( '~<script id="wpdf-guard">.*?</script>~s', '', $html
 
 $leak = preg_match( $forbidden, $html, $m ) ? $m[0] : '';
 
-echo "Startseite:\n";
-check( 'keine Google-Fonts-/Font-Awesome-URLs im HTML' . ( $leak ? " (gefunden: $leak)" : '' ), $leak === '' );
-check( 'Hostnamen kommen nirgends im HTML vor, auch nicht in lokalen Pfaden (Scanner-Simulation)', ! preg_match( '~googleapis|gstatic|\.fontawesome\.com~i', $html ) );
-check( 'keine preconnect/dns-prefetch zu Google/Font Awesome/ungenutzten CDNs', ! preg_match( '~rel=.(preconnect|dns-prefetch).[^>]*(gstatic|googleapis|fontawesome|bootstrapcdn|jsdelivr)~i', $html ) );
-check( 'dns-prefetch für weiterhin genutztes cdnjs bleibt', (bool) preg_match( '~dns-prefetch[^>]*//cdnjs\.cloudflare\.com~', $html ) );
-check( 'kein integrity-Attribut an lokalisierter Datei', ! preg_match( '~wp-dsgvo-fonts[^>]*integrity~', $html ) );
-check( 'Kit durch lokale Font Awesome Free ersetzt', strpos( $html, 'wpdf-fa-kit-0-css' ) !== false );
-check( 'Web Font Loader nutzt custom-Modul', strpos( $html, 'custom:{families:["Lato","Oswald"]' ) !== false );
-check( 'JSON-escaped URL ersetzt', strpos( $html, '"fontUrl":"\/wp-content\/uploads\/wp-dsgvo-fonts' ) !== false );
-check( 'JS-Schutz eingebunden', strpos( $html, 'id="wpdf-guard"' ) !== false );
-check( 'jQuery von cdnjs bleibt unverändert', strpos( $html, 'cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1' ) !== false );
-check( 'Doku-Link zu fontawesome.com bleibt', strpos( $html, 'https://fontawesome.com/icons' ) !== false );
-check( 'keine blockierten (fehlgeschlagenen) Einbindungen', strpos( $without_js, 'data:,' ) === false );
-check( 'lokale CSS-Kopie mit @import ausgeliefert', strpos( $html, '/wp-dsgvo-fonts/local-css/' ) !== false );
+echo "Homepage:\n";
+check( 'no Google Fonts / Font Awesome URLs in the HTML' . ( $leak ? " (found: $leak)" : '' ), $leak === '' );
+check( 'host names appear nowhere in the HTML, not even in local paths (scanner simulation)', ! preg_match( '~googleapis|gstatic|\.fontawesome\.com~i', $html ) );
+check( 'no preconnect / dns-prefetch to Google, Font Awesome or unused CDNs', ! preg_match( '~rel=.(preconnect|dns-prefetch).[^>]*(gstatic|googleapis|fontawesome|bootstrapcdn|jsdelivr)~i', $html ) );
+check( 'dns-prefetch for cdnjs, which is still in use, is kept', (bool) preg_match( '~dns-prefetch[^>]*//cdnjs\.cloudflare\.com~', $html ) );
+check( 'no integrity attribute on localized files', ! preg_match( '~wp-dsgvo-fonts[^>]*integrity~', $html ) );
+check( 'kit replaced by local Font Awesome Free', strpos( $html, 'wpdf-fa-kit-0-css' ) !== false );
+check( 'Web Font Loader uses the custom module', strpos( $html, 'custom:{families:["Lato","Oswald"]' ) !== false );
+check( 'JSON-escaped URL replaced', strpos( $html, '"fontUrl":"\/wp-content\/uploads\/wp-dsgvo-fonts' ) !== false );
+check( 'JS guard included', strpos( $html, 'id="wpdf-guard"' ) !== false );
+check( 'jQuery from cdnjs stays untouched', strpos( $html, 'cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1' ) !== false );
+check( 'documentation link to fontawesome.com stays', strpos( $html, 'https://fontawesome.com/icons' ) !== false );
+check( 'no blocked (failed) embeddings', strpos( $without_js, 'data:,' ) === false );
+check( 'local stylesheet copy with @import served', strpos( $html, '/wp-dsgvo-fonts/local-css/' ) !== false );
 
-echo "Lokale Dateien:\n";
+echo "Local files:\n";
 preg_match_all( '~/wp-content/uploads/wp-dsgvo-fonts/[^"\'\s)\\\\?#]+~', $html, $m );
 $queue = array_unique( $m[0] );
 $seen  = [];
-check( count( $queue ) . ' lokale Dateien im HTML referenziert', count( $queue ) >= 8 );
+check( count( $queue ) . ' local files referenced in the HTML', count( $queue ) >= 8 );
 
 while ( $queue ) {
 	$path = array_shift( $queue );
@@ -66,7 +66,7 @@ while ( $queue ) {
 
 	if ( substr( $path, -4 ) === '.css' ) {
 		if ( preg_match( $forbidden, $body, $found ) ) {
-			check( "$path enthält {$found[0]}", false );
+			check( "$path contains {$found[0]}", false );
 		}
 
 		preg_match_all( '~url\("(/wp-content/[^"?#]+)~', $body, $refs );
@@ -75,7 +75,7 @@ while ( $queue ) {
 }
 
 $fonts = count( preg_grep( '~\.(woff2?|ttf)$~', array_keys( $seen ) ) );
-check( count( $seen ) . " Dateien abrufbar (davon $fonts Schriftdateien), keine externen URLs in CSS", $fonts > 10 );
-check( 'keine Fremd-Hostnamen in lokalen Dateipfaden', ! preg_grep( '~googleapis|gstatic|fontawesome\.com|cdnjs\.cloudflare|jsdelivr\.net|bootstrapcdn\.com|unpkg\.com~i', array_keys( $seen ) ) );
+check( count( $seen ) . " files reachable ($fonts font files), no external URLs in CSS", $fonts > 10 );
+check( 'no third-party host names in local file paths', ! preg_grep( '~googleapis|gstatic|fontawesome\.com|cdnjs\.cloudflare|jsdelivr\.net|bootstrapcdn\.com|unpkg\.com~i', array_keys( $seen ) ) );
 
 exit( $failed ? 1 : 0 );

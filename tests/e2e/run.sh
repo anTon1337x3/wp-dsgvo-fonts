@@ -31,10 +31,10 @@ wp dsgvo-fonts flush >/dev/null
 status=0
 php check.php "$SITE" || status=1
 
-echo "Seite prüfen (WP-CLI):"
-if wp dsgvo-fonts scan; then echo "  ✓ Scanner findet keine Verweise"; else echo "  ✗ Scanner meldet Verweise"; status=1; fi
+echo "Page check (WP-CLI):"
+if wp dsgvo-fonts scan; then echo "  ✓ scanner finds no references"; else echo "  ✗ scanner reports references"; status=1; fi
 
-echo "Hinweise des Plugins:"
-wp option get wpdf_errors --format=json || echo "  (keine)"
+echo "Plugin notices:"
+wp option get wpdf_errors --format=json || echo "  (none)"
 
 exit $status

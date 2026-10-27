@@ -5,11 +5,11 @@ namespace WPDsgvoFonts;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Lokal gehostete Google Fonts und Font Awesome verwalten.
+ * Manage self-hosted Google Fonts and Font Awesome.
  */
 class Cli {
 	/**
-	 * Löscht alle lokalen Kopien und leert gängige Seiten-Caches.
+	 * Deletes all local copies and purges common page caches.
 	 *
 	 * ## EXAMPLES
 	 *
@@ -17,20 +17,20 @@ class Cli {
 	 */
 	public function flush() {
 		Cache::flush_all();
-		\WP_CLI::success( 'Cache geleert.' );
+		\WP_CLI::success( 'Cache cleared.' );
 	}
 
 	/**
-	 * Prüft eine Seite auf verbliebene Verweise auf Google Fonts oder Font Awesome.
+	 * Checks a page for remaining references to Google Fonts or Font Awesome.
 	 *
 	 * ## OPTIONS
 	 *
 	 * [<url>]
-	 * : Zu prüfende URL dieser Website. Standard: Startseite.
+	 * : URL of this site to check. Default: homepage.
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp dsgvo-fonts scan https://example.com/kontakt/
+	 *     wp dsgvo-fonts scan https://example.com/contact/
 	 */
 	public function scan( $args ) {
 		$result = Scanner::scan( $args[0] ?? home_url( '/' ) );
@@ -40,12 +40,12 @@ class Cli {
 		}
 
 		if ( ! $result['findings'] ) {
-			\WP_CLI::success( 'Keine Verweise auf Google Fonts oder Font Awesome gefunden.' );
+			\WP_CLI::success( 'No references to Google Fonts or Font Awesome found.' );
 
 			return;
 		}
 
 		\WP_CLI\Utils\format_items( 'table', $result['findings'], [ 'url', 'where' ] );
-		\WP_CLI::error( sprintf( '%d verbliebene Verweise gefunden.', count( $result['findings'] ) ) );
+		\WP_CLI::error( sprintf( '%d remaining references found.', count( $result['findings'] ) ) );
 	}
 }
