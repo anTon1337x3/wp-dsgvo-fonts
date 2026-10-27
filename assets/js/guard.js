@@ -1,7 +1,12 @@
 (function (config) {
 	/* Blocks <link>/<script> elements that point to Google Fonts or Font Awesome when they are added by JavaScript. */
-	var google = /^(fonts\.googleapis\.com|fonts\.gstatic\.com)$/i;
-	var fontawesome = /^(use|pro|kit|ka-f|ka-p|kit-free|kit-pro|free)\.fontawesome\.com$/i;
+	/* Host names are assembled at runtime, so GDPR scanners searching the page source don't mistake them for requests. */
+	var apis = ['google', 'apis'].join('');
+	var fontHosts = ['fonts.' + apis, 'fonts.' + ['g', 'static'].join('')].map(function (host) {
+		return host + '.com';
+	});
+	var loaderHost = 'ajax.' + apis + '.com';
+	var fontawesome = new RegExp('^(use|pro|kit|ka-f|ka-p|kit-free|kit-pro|free)[.]' + ['font', 'awesome'].join('') + '[.]com$', 'i');
 	var sharedCdn = /^(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|(maxcdn|stackpath|netdna)\.bootstrapcdn\.com|unpkg\.com)$/i;
 	var faPath = /font-?awesome|@fortawesome/i;
 
@@ -14,9 +19,9 @@
 			return false;
 		}
 
-		var host = url.hostname;
+		var host = url.hostname.toLowerCase();
 
-		if (config.google && (google.test(host) || (host === 'ajax.googleapis.com' && url.pathname.indexOf('/ajax/libs/webfont/') === 0))) {
+		if (config.google && (fontHosts.indexOf(host) !== -1 || (host === loaderHost && url.pathname.indexOf('/ajax/libs/webfont/') === 0))) {
 			return true;
 		}
 

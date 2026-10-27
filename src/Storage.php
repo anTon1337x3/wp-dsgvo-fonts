@@ -5,10 +5,31 @@ namespace WPDsgvoFonts;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Local copies live in wp-content/uploads/wp-dsgvo-fonts/{host}/{path}.
+ * Local copies live in wp-content/uploads/wp-dsgvo-fonts/{folder}/{path}.
  */
 class Storage {
 	const DIR = 'wp-dsgvo-fonts';
+
+	/**
+	 * Bumped whenever path_for() changes, so copies stored under the old layout get replaced.
+	 */
+	const LAYOUT = 2;
+
+	/**
+	 * Neutral folder names: GDPR scanners search the page source for the third-party host names, and a local URL
+	 * like /uploads/…/fonts.googleapis.com/… would be reported as a request to Google.
+	 */
+	const FOLDERS = [
+		'fonts.googleapis.com'       => 'google-fonts/css',
+		'fonts.gstatic.com'          => 'google-fonts/files',
+		'ajax.googleapis.com'        => 'google-fonts/loader',
+		'cdnjs.cloudflare.com'       => 'font-awesome/cdnjs',
+		'cdn.jsdelivr.net'           => 'font-awesome/jsdelivr',
+		'unpkg.com'                  => 'font-awesome/unpkg',
+		'maxcdn.bootstrapcdn.com'    => 'font-awesome/bootstrapcdn',
+		'stackpath.bootstrapcdn.com' => 'font-awesome/bootstrapcdn',
+		'netdna.bootstrapcdn.com'    => 'font-awesome/bootstrapcdn',
+	];
 
 	const EXTENSIONS = [ 'css', 'js', 'woff2', 'woff', 'ttf', 'otf', 'eot', 'svg' ];
 
@@ -59,13 +80,14 @@ class Storage {
 	 * @return string|null Null if the file type isn't one we're willing to store.
 	 */
 	public static function path_for( $url, $content_type = '' ) {
-		$parts = wp_parse_url( $url );
-		$host  = preg_replace( '~[^a-z0-9.-]~', '_', strtolower( $parts['host'] ?? '' ) );
-		$path  = $parts['path'] ?? '';
+		$parts  = wp_parse_url( $url );
+		$host   = strtolower( $parts['host'] ?? '' );
+		$path   = $parts['path'] ?? '';
+		$folder = self::folder_for( $host );
 
 		// Google Fonts stylesheets are identified by their query string, not their path.
 		if ( $host === 'fonts.googleapis.com' ) {
-			return $host . '/' . md5( $url ) . '.css';
+			return $folder . '/' . md5( $url ) . '.css';
 		}
 
 		$ext = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
@@ -74,7 +96,7 @@ class Storage {
 			$type = strtolower( trim( explode( ';', $content_type )[0] ) );
 			$ext  = self::CONTENT_TYPES[ $type ] ?? '';
 
-			return $ext ? $host . '/' . md5( $url ) . '.' . $ext : null;
+			return $ext ? $folder . '/' . md5( $url ) . '.' . $ext : null;
 		}
 
 		$segments = [];
@@ -87,7 +109,20 @@ class Storage {
 			$segments[] = preg_replace( '~[^A-Za-z0-9._@-]~', '_', rawurldecode( $segment ) );
 		}
 
-		return $host . '/' . implode( '/', $segments );
+		return $folder . '/' . implode( '/', $segments );
+	}
+
+	private static function folder_for( $host ) {
+		if ( isset( self::FOLDERS[ $host ] ) ) {
+			return self::FOLDERS[ $host ];
+		}
+
+		// use.fontawesome.com → font-awesome/use, ka-f.fontawesome.com → font-awesome/ka-f, …
+		if ( preg_match( '~^([a-z0-9-]+)\.fontawesome\.com$~', $host, $match ) ) {
+			return 'font-awesome/' . $match[1];
+		}
+
+		return 'other/' . substr( md5( $host ), 0, 10 );
 	}
 
 	public static function write( $rel, $contents ) {

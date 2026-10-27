@@ -5,6 +5,7 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 delete_option( 'wpdf_settings' );
 delete_option( 'wpdf_map' );
 delete_option( 'wpdf_errors' );
+delete_option( 'wpdf_layout' );
 
 $wpdf_dir = trailingslashit( wp_get_upload_dir()['basedir'] ) . 'wp-dsgvo-fonts';
 

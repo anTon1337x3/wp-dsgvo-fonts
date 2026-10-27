@@ -17,7 +17,7 @@ Das Plugin puffert die HTML-Ausgabe jeder Frontend-Seite (inkl. Login-Seite) und
 | `preconnect` / `dns-prefetch` zu Google / Font Awesome | werden entfernt, ebenso Hinweise auf CDNs, die danach nicht mehr genutzt werden |
 | Per JavaScript nachgeladene Fonts (Slider, Widgets, Google Maps …) | werden im Browser blockiert (JS-Schutz, abschaltbar) |
 
-Downloads passieren einmalig beim ersten Seitenaufruf, danach kommt alles aus `wp-content/uploads/wp-dsgvo-fonts/`. Kann eine Datei nicht geladen werden, wird die Einbindung blockiert (Ersatzschrift statt Datenleck) und nach 15 Minuten erneut versucht.
+Downloads passieren einmalig beim ersten Seitenaufruf, danach kommt alles aus `wp-content/uploads/wp-dsgvo-fonts/` (Unterordner `google-fonts/` und `font-awesome/`). Die Hostnamen der Anbieter tauchen weder in den lokalen Pfaden noch im JS-Schutz auf, damit DSGVO-Scanner, die den Quelltext nach `fonts.googleapis.com` durchsuchen, keinen Fehlalarm auslösen. Kann eine Datei nicht geladen werden, wird die Einbindung blockiert (Ersatzschrift statt Datenleck) und nach 15 Minuten erneut versucht.
 
 ## Installation
 

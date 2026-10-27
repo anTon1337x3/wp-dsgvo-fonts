@@ -30,6 +30,7 @@ $leak = preg_match( $forbidden, $html, $m ) ? $m[0] : '';
 
 echo "Startseite:\n";
 check( 'keine Google-Fonts-/Font-Awesome-URLs im HTML' . ( $leak ? " (gefunden: $leak)" : '' ), $leak === '' );
+check( 'Hostnamen kommen nirgends im HTML vor, auch nicht in lokalen Pfaden (Scanner-Simulation)', ! preg_match( '~googleapis|gstatic|\.fontawesome\.com~i', $html ) );
 check( 'keine preconnect/dns-prefetch zu Google/Font Awesome/ungenutzten CDNs', ! preg_match( '~rel=.(preconnect|dns-prefetch).[^>]*(gstatic|googleapis|fontawesome|bootstrapcdn|jsdelivr)~i', $html ) );
 check( 'dns-prefetch für weiterhin genutztes cdnjs bleibt', (bool) preg_match( '~dns-prefetch[^>]*//cdnjs\.cloudflare\.com~', $html ) );
 check( 'kein integrity-Attribut an lokalisierter Datei', ! preg_match( '~wp-dsgvo-fonts[^>]*integrity~', $html ) );
@@ -75,5 +76,6 @@ while ( $queue ) {
 
 $fonts = count( preg_grep( '~\.(woff2?|ttf)$~', array_keys( $seen ) ) );
 check( count( $seen ) . " Dateien abrufbar (davon $fonts Schriftdateien), keine externen URLs in CSS", $fonts > 10 );
+check( 'keine Fremd-Hostnamen in lokalen Dateipfaden', ! preg_grep( '~googleapis|gstatic|fontawesome\.com|cdnjs\.cloudflare|jsdelivr\.net|bootstrapcdn\.com|unpkg\.com~i', array_keys( $seen ) ) );
 
 exit( $failed ? 1 : 0 );
