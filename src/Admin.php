@@ -5,7 +5,7 @@ namespace WPDsgvoFonts;
 defined( 'ABSPATH' ) || exit;
 
 class Admin {
-	const PAGE = 'dsgvo-fonts';
+	const PAGE = 'knuspermedia-local-fonts-icons';
 
 	const CONFLICTING_PLUGINS = [
 		'host-webfonts-local/host-webfonts-local.php' => 'OMGF',
@@ -25,7 +25,7 @@ class Admin {
 	}
 
 	public function menu() {
-		add_options_page( 'DSGVO Fonts', 'DSGVO Fonts', 'manage_options', self::PAGE, [ $this, 'render' ] );
+		add_options_page( 'knuspermedia Local Fonts & Icons', 'Local Fonts & Icons', 'manage_options', self::PAGE, [ $this, 'render' ] );
 	}
 
 	public function register_settings() {
@@ -33,7 +33,7 @@ class Admin {
 	}
 
 	public function action_links( $links ) {
-		array_unshift( $links, sprintf( '<a href="%s">%s</a>', esc_url( $this->page_url() ), esc_html__( 'Settings', 'dsgvo-fonts' ) ) );
+		array_unshift( $links, sprintf( '<a href="%s">%s</a>', esc_url( $this->page_url() ), esc_html__( 'Settings', 'knuspermedia-local-fonts-icons' ) ) );
 
 		return $links;
 	}
@@ -50,11 +50,11 @@ class Admin {
 		foreach ( self::CONFLICTING_PLUGINS as $file => $name ) {
 			if ( is_plugin_active( $file ) ) {
 				printf(
-					'<div class="notice notice-warning"><p><strong>DSGVO Fonts:</strong> %s</p></div>',
+					'<div class="notice notice-warning"><p><strong>knuspermedia Local Fonts & Icons:</strong> %s</p></div>',
 					esc_html(
 						sprintf(
 							/* translators: %s: name of another font plugin, e.g. OMGF */
-							__( '%s is active as well. Please deactivate it, so the two plugins don\'t interfere with each other.', 'dsgvo-fonts' ),
+							__( '%s is active as well. Please deactivate it, so the two plugins don\'t interfere with each other.', 'knuspermedia-local-fonts-icons' ),
 							$name
 						)
 					)
@@ -67,7 +67,7 @@ class Admin {
 		check_admin_referer( 'wpdf_flush' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to do this.', 'dsgvo-fonts' ) );
+			wp_die( esc_html__( 'You are not allowed to do this.', 'knuspermedia-local-fonts-icons' ) );
 		}
 
 		Cache::flush_all();
@@ -80,7 +80,7 @@ class Admin {
 		check_admin_referer( 'wpdf_scan' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to do this.', 'dsgvo-fonts' ) );
+			wp_die( esc_html__( 'You are not allowed to do this.', 'knuspermedia-local-fonts-icons' ) );
 		}
 
 		$url = esc_url_raw( wp_unslash( $_POST['wpdf_scan_url'] ?? '' ) );
@@ -110,23 +110,23 @@ class Admin {
 		$name   = Settings::OPTION;
 		?>
 		<div class="wrap">
-			<h1>DSGVO Fonts</h1>
-			<p><?php esc_html_e( 'Google Fonts and Font Awesome are downloaded by your server on the first page view and served locally afterwards. Visitors\' browsers don\'t connect to Google or Font Awesome.', 'dsgvo-fonts' ); ?></p>
+			<h1>knuspermedia Local Fonts & Icons</h1>
+			<p><?php esc_html_e( 'Google Fonts and Font Awesome are downloaded by your server on the first page view and served locally afterwards. Visitors\' browsers don\'t connect to Google or Font Awesome.', 'knuspermedia-local-fonts-icons' ); ?></p>
 
 			<?php if ( $notice === 'flushed' ) : ?>
-				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'The cache was cleared. Fonts are downloaded again on the next page view.', 'dsgvo-fonts' ); ?></p></div>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'The cache was cleared. Fonts are downloaded again on the next page view.', 'knuspermedia-local-fonts-icons' ); ?></p></div>
 			<?php elseif ( $notice === 'scanned' ) : ?>
-				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'The page check is complete.', 'dsgvo-fonts' ); ?></p></div>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'The page check is complete.', 'knuspermedia-local-fonts-icons' ); ?></p></div>
 			<?php elseif ( isset( $_GET['settings-updated'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Set by options.php. ?>
-				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved. The font cache was cleared.', 'dsgvo-fonts' ); ?></p></div>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved. The font cache was cleared.', 'knuspermedia-local-fonts-icons' ); ?></p></div>
 			<?php endif; ?>
 
-			<h2><?php esc_html_e( 'Status', 'dsgvo-fonts' ); ?></h2>
+			<h2><?php esc_html_e( 'Status', 'knuspermedia-local-fonts-icons' ); ?></h2>
 			<p>
 				<?php
 				printf(
 					/* translators: 1: number of files, 2: total size, 3: folder */
-					esc_html( _n( '%1$d local file (%2$s) in %3$s', '%1$d local files (%2$s) in %3$s', (int) $stats['files'], 'dsgvo-fonts' ) ),
+					esc_html( _n( '%1$d local file (%2$s) in %3$s', '%1$d local files (%2$s) in %3$s', (int) $stats['files'], 'knuspermedia-local-fonts-icons' ) ),
 					(int) $stats['files'],
 					esc_html( size_format( $stats['bytes'] ) ? size_format( $stats['bytes'] ) : '0 B' ),
 					'<code>' . esc_html( Storage::base_url() ) . '</code>'
@@ -139,37 +139,37 @@ class Admin {
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="wpdf_flush" />
 				<?php wp_nonce_field( 'wpdf_flush' ); ?>
-				<?php submit_button( __( 'Clear cache', 'dsgvo-fonts' ), 'secondary', 'submit', false ); ?>
+				<?php submit_button( __( 'Clear cache', 'knuspermedia-local-fonts-icons' ), 'secondary', 'submit', false ); ?>
 			</form>
 
-			<h2 id="wpdf-scan"><?php esc_html_e( 'Check page', 'dsgvo-fonts' ); ?></h2>
-			<p><?php esc_html_e( 'Loads a page like a visitor who isn\'t logged in and lists all remaining references to Google Fonts or Font Awesome in its HTML and stylesheets.', 'dsgvo-fonts' ); ?></p>
+			<h2 id="wpdf-scan"><?php esc_html_e( 'Check page', 'knuspermedia-local-fonts-icons' ); ?></h2>
+			<p><?php esc_html_e( 'Loads a page like a visitor who isn\'t logged in and lists all remaining references to Google Fonts or Font Awesome in its HTML and stylesheets.', 'knuspermedia-local-fonts-icons' ); ?></p>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="wpdf_scan" />
 				<?php wp_nonce_field( 'wpdf_scan' ); ?>
 				<input type="url" name="wpdf_scan_url" class="regular-text" value="<?php echo esc_attr( $scan['url'] ?? home_url( '/' ) ); ?>" />
-				<?php submit_button( __( 'Check', 'dsgvo-fonts' ), 'primary', 'submit', false ); ?>
+				<?php submit_button( __( 'Check', 'knuspermedia-local-fonts-icons' ), 'primary', 'submit', false ); ?>
 			</form>
 			<?php $this->render_scan( $scan ); ?>
 
-			<h2><?php esc_html_e( 'Settings', 'dsgvo-fonts' ); ?></h2>
+			<h2><?php esc_html_e( 'Settings', 'knuspermedia-local-fonts-icons' ); ?></h2>
 			<form method="post" action="options.php">
 				<?php settings_fields( self::PAGE ); ?>
 				<table class="form-table" role="presentation">
 					<tr>
-						<th scope="row"><?php esc_html_e( 'Services', 'dsgvo-fonts' ); ?></th>
+						<th scope="row"><?php esc_html_e( 'Services', 'knuspermedia-local-fonts-icons' ); ?></th>
 						<td>
-							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[google]" value="1" <?php checked( $settings['google'] ); ?> /> <?php esc_html_e( 'Self-host Google Fonts', 'dsgvo-fonts' ); ?></label><br />
-							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[fontawesome]" value="1" <?php checked( $settings['fontawesome'] ); ?> /> <?php esc_html_e( 'Self-host Font Awesome', 'dsgvo-fonts' ); ?></label>
+							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[google]" value="1" <?php checked( $settings['google'] ); ?> /> <?php esc_html_e( 'Self-host Google Fonts', 'knuspermedia-local-fonts-icons' ); ?></label><br />
+							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[fontawesome]" value="1" <?php checked( $settings['fontawesome'] ); ?> /> <?php esc_html_e( 'Self-host Font Awesome', 'knuspermedia-local-fonts-icons' ); ?></label>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><?php esc_html_e( 'Subsets (Google Fonts)', 'dsgvo-fonts' ); ?></th>
+						<th scope="row"><?php esc_html_e( 'Subsets (Google Fonts)', 'knuspermedia-local-fonts-icons' ); ?></th>
 						<td>
 							<?php foreach ( Settings::subset_labels() as $subset => $label ) : ?>
 								<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[subsets][]" value="<?php echo esc_attr( $subset ); ?>" <?php checked( in_array( $subset, $settings['subsets'], true ) ); ?> /> <?php echo esc_html( $label ); ?></label><br />
 							<?php endforeach; ?>
-							<p class="description"><?php esc_html_e( 'If a font offers none of the selected subsets, all of its files are loaded.', 'dsgvo-fonts' ); ?></p>
+							<p class="description"><?php esc_html_e( 'If a font offers none of the selected subsets, all of its files are loaded.', 'knuspermedia-local-fonts-icons' ); ?></p>
 						</td>
 					</tr>
 					<tr>
@@ -177,43 +177,43 @@ class Admin {
 						<td>
 							<select id="wpdf-font-display" name="<?php echo esc_attr( $name ); ?>[font_display]">
 								<?php foreach ( Settings::FONT_DISPLAY as $value ) : ?>
-									<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $settings['font_display'], $value ); ?>><?php echo esc_html( $value === 'keep' ? __( 'Don\'t change', 'dsgvo-fonts' ) : $value ); ?></option>
+									<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $settings['font_display'], $value ); ?>><?php echo esc_html( $value === 'keep' ? __( 'Don\'t change', 'knuspermedia-local-fonts-icons' ) : $value ); ?></option>
 								<?php endforeach; ?>
 							</select>
-							<p class="description"><?php esc_html_e( '"swap" shows text immediately in a fallback font and prevents invisible text while fonts load.', 'dsgvo-fonts' ); ?></p>
+							<p class="description"><?php esc_html_e( '"swap" shows text immediately in a fallback font and prevents invisible text while fonts load.', 'knuspermedia-local-fonts-icons' ); ?></p>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><?php esc_html_e( 'Local stylesheets', 'dsgvo-fonts' ); ?></th>
+						<th scope="row"><?php esc_html_e( 'Local stylesheets', 'knuspermedia-local-fonts-icons' ); ?></th>
 						<td>
-							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[local_css]" value="1" <?php checked( $settings['local_css'] ); ?> /> <?php esc_html_e( 'Search theme and plugin stylesheets for imports of Google Fonts / Font Awesome and serve cleaned copies', 'dsgvo-fonts' ); ?></label>
+							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[local_css]" value="1" <?php checked( $settings['local_css'] ); ?> /> <?php esc_html_e( 'Search theme and plugin stylesheets for imports of Google Fonts / Font Awesome and serve cleaned copies', 'knuspermedia-local-fonts-icons' ); ?></label>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><?php esc_html_e( 'JavaScript guard', 'dsgvo-fonts' ); ?></th>
+						<th scope="row"><?php esc_html_e( 'JavaScript guard', 'knuspermedia-local-fonts-icons' ); ?></th>
 						<td>
-							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[js_guard]" value="1" <?php checked( $settings['js_guard'] ); ?> /> <?php esc_html_e( 'Block Google Fonts and Font Awesome files that are added by JavaScript', 'dsgvo-fonts' ); ?></label>
-							<p class="description"><?php esc_html_e( 'Applies e.g. to sliders or widgets that add fonts in the browser. These elements then show the fallback font.', 'dsgvo-fonts' ); ?></p>
+							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[js_guard]" value="1" <?php checked( $settings['js_guard'] ); ?> /> <?php esc_html_e( 'Block Google Fonts and Font Awesome files that are added by JavaScript', 'knuspermedia-local-fonts-icons' ); ?></label>
+							<p class="description"><?php esc_html_e( 'Applies e.g. to sliders or widgets that add fonts in the browser. These elements then show the fallback font.', 'knuspermedia-local-fonts-icons' ); ?></p>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="wpdf-kit-version"><?php esc_html_e( 'Font Awesome Kits', 'dsgvo-fonts' ); ?></label></th>
+						<th scope="row"><label for="wpdf-kit-version"><?php esc_html_e( 'Font Awesome Kits', 'knuspermedia-local-fonts-icons' ); ?></label></th>
 						<td>
 							<input id="wpdf-kit-version" type="text" class="small-text" name="<?php echo esc_attr( $name ); ?>[fa_kit_version]" value="<?php echo esc_attr( $settings['fa_kit_version'] ); ?>" placeholder="auto" />
 							<p class="description">
 								<?php
 								printf(
 									/* translators: %s: Font Awesome version number */
-									esc_html__( 'Font Awesome Kits (kit scripts) are replaced by a local copy of Font Awesome Free. Leave empty to use the kit\'s version (fallback: %s). Pro icons and custom kit icons are not included.', 'dsgvo-fonts' ),
+									esc_html__( 'Font Awesome Kits (kit scripts) are replaced by a local copy of Font Awesome Free. Leave empty to use the kit\'s version (fallback: %s). Pro icons and custom kit icons are not included.', 'knuspermedia-local-fonts-icons' ),
 									esc_html( Settings::FA_FALLBACK_VERSION )
 								);
 								?>
 							</p>
-							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[fa_kit_shims]" value="1" <?php checked( $settings['fa_kit_shims'] ); ?> /> <?php esc_html_e( 'Also load compatibility for Font Awesome 4 classes (fa fa-…)', 'dsgvo-fonts' ); ?></label>
+							<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[fa_kit_shims]" value="1" <?php checked( $settings['fa_kit_shims'] ); ?> /> <?php esc_html_e( 'Also load compatibility for Font Awesome 4 classes (fa fa-…)', 'knuspermedia-local-fonts-icons' ); ?></label>
 						</td>
 					</tr>
 				</table>
-				<?php submit_button( __( 'Save and clear cache', 'dsgvo-fonts' ) ); ?>
+				<?php submit_button( __( 'Save and clear cache', 'knuspermedia-local-fonts-icons' ) ); ?>
 			</form>
 		</div>
 		<?php
@@ -228,7 +228,7 @@ class Admin {
 		);
 
 		if ( ! $rows ) {
-			echo '<p><em>' . esc_html__( 'No files localized yet. Visit a page or use "Check page".', 'dsgvo-fonts' ) . '</em></p>';
+			echo '<p><em>' . esc_html__( 'No files localized yet. Visit a page or use "Check page".', 'knuspermedia-local-fonts-icons' ) . '</em></p>';
 
 			return;
 		}
@@ -236,23 +236,23 @@ class Admin {
 		$labels = [
 			'google'      => 'Google Fonts',
 			'fontawesome' => 'Font Awesome',
-			'local'       => __( 'Local stylesheet copy', 'dsgvo-fonts' ),
+			'local'       => __( 'Local stylesheet copy', 'knuspermedia-local-fonts-icons' ),
 		];
 		?>
 		<details>
 			<summary>
 				<?php
 				/* translators: %d: number of localized sources */
-				echo esc_html( sprintf( _n( 'Show %d localized source', 'Show %d localized sources', count( $rows ), 'dsgvo-fonts' ), count( $rows ) ) );
+				echo esc_html( sprintf( _n( 'Show %d localized source', 'Show %d localized sources', count( $rows ), 'knuspermedia-local-fonts-icons' ), count( $rows ) ) );
 				?>
 			</summary>
 			<table class="widefat striped" style="margin-top:8px">
 				<thead>
 					<tr>
-						<th><?php esc_html_e( 'Type', 'dsgvo-fonts' ); ?></th>
-						<th><?php esc_html_e( 'Source', 'dsgvo-fonts' ); ?></th>
-						<th><?php esc_html_e( 'Local file', 'dsgvo-fonts' ); ?></th>
-						<th><?php esc_html_e( 'Date', 'dsgvo-fonts' ); ?></th>
+						<th><?php esc_html_e( 'Type', 'knuspermedia-local-fonts-icons' ); ?></th>
+						<th><?php esc_html_e( 'Source', 'knuspermedia-local-fonts-icons' ); ?></th>
+						<th><?php esc_html_e( 'Local file', 'knuspermedia-local-fonts-icons' ); ?></th>
+						<th><?php esc_html_e( 'Date', 'knuspermedia-local-fonts-icons' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -283,10 +283,10 @@ class Admin {
 		?>
 		<div class="notice notice-warning inline">
 			<p>
-				<strong><?php esc_html_e( 'Notices and errors:', 'dsgvo-fonts' ); ?></strong>
+				<strong><?php esc_html_e( 'Notices and errors:', 'knuspermedia-local-fonts-icons' ); ?></strong>
 				<?php
 				/* translators: %d: minutes */
-				echo esc_html( sprintf( __( 'Files that can\'t be downloaded are blocked (the page uses the fallback font) and retried after %d minutes.', 'dsgvo-fonts' ), (int) ( Localizer::RETRY_AFTER / MINUTE_IN_SECONDS ) ) );
+				echo esc_html( sprintf( __( 'Files that can\'t be downloaded are blocked (the page uses the fallback font) and retried after %d minutes.', 'knuspermedia-local-fonts-icons' ), (int) ( Localizer::RETRY_AFTER / MINUTE_IN_SECONDS ) ) );
 				?>
 			</p>
 			<ul>
@@ -307,7 +307,7 @@ class Admin {
 			'<p>%s</p>',
 			sprintf(
 				/* translators: 1: checked URL, 2: date and time */
-				esc_html__( 'Result for %1$s from %2$s:', 'dsgvo-fonts' ),
+				esc_html__( 'Result for %1$s from %2$s:', 'knuspermedia-local-fonts-icons' ),
 				sprintf( '<a href="%1$s" target="_blank" rel="noopener">%1$s</a>', esc_url( $scan['url'] ) ),
 				esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $scan['time'] ) )
 			)
@@ -315,13 +315,13 @@ class Admin {
 
 		if ( ! empty( $scan['error'] ) ) {
 			/* translators: %s: error message */
-			printf( '<div class="notice notice-error inline"><p>%s</p></div>', esc_html( sprintf( __( 'The page could not be checked: %s', 'dsgvo-fonts' ), $scan['error'] ) ) );
+			printf( '<div class="notice notice-error inline"><p>%s</p></div>', esc_html( sprintf( __( 'The page could not be checked: %s', 'knuspermedia-local-fonts-icons' ), $scan['error'] ) ) );
 
 			return;
 		}
 
 		if ( ! $scan['findings'] ) {
-			echo '<div class="notice notice-success inline"><p>✅ ' . esc_html__( 'No references to Google Fonts or Font Awesome found.', 'dsgvo-fonts' ) . '</p></div>';
+			echo '<div class="notice notice-success inline"><p>✅ ' . esc_html__( 'No references to Google Fonts or Font Awesome found.', 'knuspermedia-local-fonts-icons' ) . '</p></div>';
 
 			return;
 		}
@@ -331,7 +331,7 @@ class Admin {
 				<strong>
 					<?php
 					/* translators: %d: number of references */
-					echo esc_html( sprintf( _n( '%d remaining reference found:', '%d remaining references found:', count( $scan['findings'] ), 'dsgvo-fonts' ), count( $scan['findings'] ) ) );
+					echo esc_html( sprintf( _n( '%d remaining reference found:', '%d remaining references found:', count( $scan['findings'] ), 'knuspermedia-local-fonts-icons' ), count( $scan['findings'] ) ) );
 					?>
 				</strong>
 			</p>
@@ -340,7 +340,7 @@ class Admin {
 					<li><code style="word-break:break-all"><?php echo esc_html( $finding['url'] ); ?></code> – <?php echo esc_html( $finding['where'] ); ?></li>
 				<?php endforeach; ?>
 			</ul>
-			<p><?php esc_html_e( 'References of a service that is disabled in the settings are kept on purpose. If a page cache is active, clear it and check again.', 'dsgvo-fonts' ); ?></p>
+			<p><?php esc_html_e( 'References of a service that is disabled in the settings are kept on purpose. If a page cache is active, clear it and check again.', 'knuspermedia-local-fonts-icons' ); ?></p>
 		</div>
 		<?php
 	}

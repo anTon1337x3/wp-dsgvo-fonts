@@ -64,6 +64,20 @@ class Localizer {
 	}
 
 	/**
+	 * @return string[] URLs of the Font Awesome Kits seen on this site so far.
+	 */
+	public function known_kits() {
+		return array_keys(
+			array_filter(
+				$this->map,
+				static function ( $entry ) {
+					return ! empty( $entry['version'] );
+				}
+			)
+		);
+	}
+
+	/**
 	 * @return string|false Local URL, or false if the file couldn't be downloaded.
 	 */
 	public function localize( $url ) {
@@ -111,7 +125,7 @@ class Localizer {
 		$rel = Storage::path_for( $url, $response['type'] );
 
 		if ( ! $rel ) {
-			return new \WP_Error( 'wpdf_type', __( 'Unknown file type', 'dsgvo-fonts' ) );
+			return new \WP_Error( 'wpdf_type', __( 'Unknown file type', 'knuspermedia-local-fonts-icons' ) );
 		}
 
 		$body = $response['body'];
@@ -130,7 +144,7 @@ class Localizer {
 
 		if ( ! Storage::write( $rel, $body ) ) {
 			/* translators: %s: file path */
-			return new \WP_Error( 'wpdf_write', sprintf( __( 'File could not be saved: %s', 'dsgvo-fonts' ), $rel ) );
+			return new \WP_Error( 'wpdf_write', sprintf( __( 'File could not be saved: %s', 'knuspermedia-local-fonts-icons' ), $rel ) );
 		}
 
 		return $rel;
@@ -141,7 +155,7 @@ class Localizer {
 	 */
 	private function prepare_google_css( $css ) {
 		if ( stripos( $css, '@font-face' ) === false ) {
-			return new \WP_Error( 'wpdf_google_css', __( 'No @font-face rules in the response from Google', 'dsgvo-fonts' ) );
+			return new \WP_Error( 'wpdf_google_css', __( 'No @font-face rules in the response from Google', 'knuspermedia-local-fonts-icons' ) );
 		}
 
 		$allowed  = (array) Settings::get( 'subsets' );
@@ -242,15 +256,12 @@ class Localizer {
 	 */
 	public function kit_stylesheets( $kit_url ) {
 		$kit_url = preg_replace( '~[?#].*$~', '', Hosts::normalize( $kit_url ) );
-		$version = Settings::get( 'fa_kit_version' );
-
-		if ( ! $version ) {
-			if ( empty( $this->map[ $kit_url ]['version'] ) ) {
-				$this->remember( $kit_url, [ 'file' => '', 'type' => 'fontawesome', 'version' => $this->detect_kit_version( $kit_url ) ] );
-			}
-
-			$version = $this->map[ $kit_url ]['version'];
+		// Also remembers the kit, so it is replaced on every page view even if its tag is printed by the theme.
+		if ( empty( $this->map[ $kit_url ]['version'] ) ) {
+			$this->remember( $kit_url, [ 'file' => '', 'type' => 'fontawesome', 'version' => $this->detect_kit_version( $kit_url ) ] );
 		}
+
+		$version = Settings::get( 'fa_kit_version' ) ?: $this->map[ $kit_url ]['version'];
 
 		// Downloaded server-side and served locally, like every other file.
 		$base  = 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@' . $version . '/css/'; // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent
@@ -275,14 +286,14 @@ class Localizer {
 			$this->log_error(
 				$kit_url,
 				/* translators: 1: error message, 2: Font Awesome version number */
-				sprintf( __( 'Kit version could not be detected (%1$s), using Font Awesome Free %2$s', 'dsgvo-fonts' ), $response->get_error_message(), Settings::FA_FALLBACK_VERSION )
+				sprintf( __( 'Kit version could not be detected (%1$s), using Font Awesome Free %2$s', 'knuspermedia-local-fonts-icons' ), $response->get_error_message(), Settings::FA_FALLBACK_VERSION )
 			);
 
 			return Settings::FA_FALLBACK_VERSION;
 		}
 
 		if ( preg_match( '~"license"\s*:\s*"pro"~i', $response['body'] ) ) {
-			$this->log_error( $kit_url, __( 'Pro kit detected: Font Awesome Free is provided locally, Pro icons are missing.', 'dsgvo-fonts' ) );
+			$this->log_error( $kit_url, __( 'Pro kit detected: Font Awesome Free is provided locally, Pro icons are missing.', 'knuspermedia-local-fonts-icons' ) );
 		}
 
 		if ( preg_match( '~"version"\s*:\s*"(\d+\.\d+\.\d+)"~', $response['body'], $match ) ) {
@@ -340,7 +351,7 @@ class Localizer {
 				$rel = 'local-css/' . md5( $path ) . '.css';
 				Storage::ensure_dir();
 
-				if ( ! Storage::write( $rel, "/* Copy of " . Hosts::shorten( $absolute ) . " (DSGVO Fonts) */\n" . $rewritten ) ) {
+				if ( ! Storage::write( $rel, "/* Copy of " . Hosts::shorten( $absolute ) . " (knuspermedia Local Fonts & Icons) */\n" . $rewritten ) ) {
 					return null;
 				}
 			}

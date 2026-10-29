@@ -25,14 +25,14 @@ if ! wp core is-installed; then
 	wp rewrite structure '/%postname%/' >/dev/null
 fi
 
-wp plugin activate dsgvo-fonts >/dev/null
-wp dsgvo-fonts flush >/dev/null
+wp plugin activate knuspermedia-local-fonts-icons >/dev/null
+wp local-fonts-icons flush >/dev/null
 
 status=0
 php check.php "$SITE" || status=1
 
 echo "Page check (WP-CLI):"
-if wp dsgvo-fonts scan; then echo "  ✓ scanner finds no references"; else echo "  ✗ scanner reports references"; status=1; fi
+if wp local-fonts-icons scan; then echo "  ✓ scanner finds no references"; else echo "  ✗ scanner reports references"; status=1; fi
 
 echo "Plugin notices:"
 wp option get wpdf_errors --format=json || echo "  (none)"

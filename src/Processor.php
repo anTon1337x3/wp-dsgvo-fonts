@@ -36,6 +36,61 @@ class Processor {
 	public function init() {
 		add_action( 'template_redirect', [ $this, 'start_buffer' ], 1 );
 		add_action( 'login_init', [ $this, 'start_buffer' ], 1 );
+
+		// The guard is enqueued first, so it runs before any other script; kits are replaced after everything is enqueued.
+		foreach ( [ 'wp_enqueue_scripts', 'login_enqueue_scripts' ] as $hook ) {
+			add_action( $hook, [ $this, 'enqueue_guard' ], PHP_INT_MIN );
+			add_action( $hook, [ $this, 'enqueue_kits' ], PHP_INT_MAX );
+		}
+	}
+
+	/**
+	 * Blocks Google Fonts / Font Awesome stylesheets and scripts that are added later by JavaScript (e.g. Google Maps,
+	 * sliders, page builder widgets).
+	 */
+	public function enqueue_guard() {
+		if ( ! Settings::get( 'js_guard' ) || ! $this->should_process() ) {
+			return;
+		}
+
+		$config = wp_json_encode(
+			[
+				'google'      => (bool) Settings::get( 'google' ),
+				'fontawesome' => (bool) Settings::get( 'fontawesome' ),
+			]
+		);
+
+		wp_register_script( 'wpdf-guard', false, [], WPDF_VERSION, false );
+		wp_add_inline_script( 'wpdf-guard', str_replace( '__WPDF_CONFIG__', $config, trim( (string) file_get_contents( WPDF_DIR . 'assets/js/guard.js' ) ) ) );
+		wp_enqueue_script( 'wpdf-guard' );
+	}
+
+	/**
+	 * Font Awesome Kits are replaced by the matching Font Awesome Free release, stored locally. Kits enqueued through
+	 * WordPress are emptied; kits written directly into a theme are removed from the HTML and remembered, so their
+	 * replacement is enqueued from then on.
+	 */
+	public function enqueue_kits() {
+		if ( ! Settings::get( 'fontawesome' ) || ! $this->should_process() ) {
+			return;
+		}
+
+		$kits    = Localizer::instance()->known_kits();
+		$scripts = wp_scripts();
+
+		foreach ( $scripts->registered as $script ) {
+			if ( is_string( $script->src ) && Hosts::is_kit_script( $script->src ) ) {
+				$kits[] = $script->src;
+				// Keeps the handle, so scripts that depend on the kit still load.
+				$script->src = false;
+			}
+		}
+
+		foreach ( array_unique( $kits ) as $kit ) {
+			foreach ( Localizer::instance()->kit_stylesheets( $kit ) as $url ) {
+				wp_enqueue_style( 'wpdf-fa-kit-' . substr( md5( $url ), 0, 8 ), $url, [], WPDF_VERSION );
+			}
+		}
 	}
 
 	public function should_process() {
@@ -76,7 +131,7 @@ class Processor {
 		try {
 			$html = $this->process( $html );
 		} catch ( \Throwable $e ) {
-			// Shown under Settings → DSGVO Fonts.
+			// Shown under Settings → Local Fonts & Icons.
 			Localizer::instance()->log_error( home_url( add_query_arg( [] ) ), $e->getMessage() );
 		}
 
@@ -102,10 +157,6 @@ class Processor {
 		$html = $this->process_webfont_loader( $html );
 		$html = $this->replace_remaining( $html );
 		$html = $this->remove_orphaned_hints( $html );
-
-		if ( Settings::get( 'js_guard' ) ) {
-			$html = $this->inject_guard( $html );
-		}
 
 		return apply_filters( 'wpdf_processed_html', $html );
 	}
@@ -158,7 +209,8 @@ class Processor {
 	}
 
 	/**
-	 * <script src="https://kit.fontawesome.com/abc123.js"> becomes <link>s to a local Font Awesome Free copy.
+	 * Removes <script src="https://kit.fontawesome.com/abc123.js"> tags that a theme prints directly. The kit is
+	 * remembered, so enqueue_kits() adds the local replacement from the next page view on.
 	 */
 	private function replace_kits( $html ) {
 		if ( ! Settings::get( 'fontawesome' ) ) {
@@ -174,15 +226,9 @@ class Processor {
 					return $match[0];
 				}
 
-				$links = '';
+				Localizer::instance()->kit_stylesheets( $src );
 
-				foreach ( Localizer::instance()->kit_stylesheets( $src ) as $i => $url ) {
-					// The kit <script> is replaced inside the buffered HTML, where enqueueing is no longer possible.
-					// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
-					$links .= sprintf( '<link rel="stylesheet" id="wpdf-fa-kit-%d-css" href="%s" media="all" />', $i, esc_url( $url ) );
-				}
-
-				return $links;
+				return '';
 			},
 			$html
 		);
@@ -297,28 +343,6 @@ class Processor {
 		}
 
 		return Localizer::instance()->localize( $url ) ?: self::BLOCKED;
-	}
-
-	/**
-	 * Runs before any other script and blocks Google Fonts / Font Awesome stylesheets and scripts that are
-	 * added later by JavaScript (e.g. Google Maps, sliders, consent-less widgets).
-	 */
-	private function inject_guard( $html ) {
-		$js = file_get_contents( WPDF_DIR . 'assets/js/guard.js' );
-
-		if ( ! $js ) {
-			return $html;
-		}
-
-		$config = wp_json_encode(
-			[
-				'google'      => (bool) Settings::get( 'google' ),
-				'fontawesome' => (bool) Settings::get( 'fontawesome' ),
-			]
-		);
-		$script = '<script id="wpdf-guard">' . str_replace( '__WPDF_CONFIG__', $config, trim( $js ) ) . '</script>';
-
-		return preg_replace( '~<head\b[^>]*>~i', '$0' . str_replace( [ '\\', '$' ], [ '\\\\', '\\$' ], $script ), $html, 1 );
 	}
 
 	/**

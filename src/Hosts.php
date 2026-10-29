@@ -37,12 +37,11 @@ class Hosts {
 		'maxcdn.bootstrapcdn.com',
 		'stackpath.bootstrapcdn.com',
 		'netdna.bootstrapcdn.com',
-		'unpkg.com',
 	];
 
 	const FONTAWESOME_PATH = '~font-?awesome|@fortawesome~i';
 
-	const HOST_PATTERN = 'fonts\.googleapis\.com|fonts\.gstatic\.com|ajax\.googleapis\.com|(?:use|pro|kit|ka-f|ka-p|kit-free|kit-pro|free)\.fontawesome\.com|cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|(?:maxcdn|stackpath|netdna)\.bootstrapcdn\.com|unpkg\.com';
+	const HOST_PATTERN = 'fonts\.googleapis\.com|fonts\.gstatic\.com|ajax\.googleapis\.com|(?:use|pro|kit|ka-f|ka-p|kit-free|kit-pro|free)\.fontawesome\.com|cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|(?:maxcdn|stackpath|netdna)\.bootstrapcdn\.com';
 
 	/**
 	 * @return string|null 'google', 'fontawesome' or null if the URL isn't ours to handle.
@@ -109,18 +108,23 @@ class Hosts {
 	}
 
 	/**
-	 * Matches URLs as they appear in HTML attributes, CSS and JS strings. An ampersand is only allowed as an
-	 * HTML entity, so a URL never swallows a following &quot;.
+	 * An ampersand belongs to the URL unless it starts an encoded quote or angle bracket, so a URL never swallows
+	 * a following &quot;.
+	 */
+	const URL_AMPERSAND = '&(?!(?:quot|apos|lt|gt|#0*3[49]|#x2[27]|#0*6[02]|#x3[ce]);)';
+
+	/**
+	 * Matches URLs as they appear in HTML attributes, CSS and JS strings.
 	 */
 	public static function url_regex() {
-		return '~(?:https?:)?//(?:' . self::HOST_PATTERN . ')(?:/(?:&amp;|&#0?38;|[^\s"\'<>()\\\\&])*)?~i';
+		return '~(?:https?:)?//(?:' . self::HOST_PATTERN . ')(?:/(?:' . self::URL_AMPERSAND . '|[^\s"\'<>()\\\\&])*)?~i';
 	}
 
 	/**
 	 * Same as url_regex(), but for JSON encoded strings, e.g. https:\/\/fonts.googleapis.com\/css?family=...
 	 */
 	public static function escaped_url_regex() {
-		return '~(?:https?:)?\\\\/\\\\/(?:' . self::HOST_PATTERN . ')(?:\\\\/(?:\\\\/|\\\\u0026|&amp;|[^\s"\'<>()\\\\&])*)?~i';
+		return '~(?:https?:)?\\\\/\\\\/(?:' . self::HOST_PATTERN . ')(?:\\\\/(?:\\\\/|\\\\u0026|' . self::URL_AMPERSAND . '|[^\s"\'<>()\\\\&])*)?~i';
 	}
 
 	public static function unescape_json_url( $url ) {

@@ -11,7 +11,6 @@ class Plugin {
 	public static function boot() {
 		( new Processor() )->init();
 
-		add_action( 'init', [ self::class, 'load_translations' ] );
 		add_action( 'init', [ self::class, 'maybe_upgrade' ] );
 
 		if ( is_admin() ) {
@@ -19,16 +18,8 @@ class Plugin {
 		}
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			\WP_CLI::add_command( 'dsgvo-fonts', Cli::class );
+			\WP_CLI::add_command( 'local-fonts-icons', Cli::class );
 		}
-	}
-
-	/**
-	 * Bundled translations, used until (or instead of) a language pack from translate.wordpress.org.
-	 */
-	public static function load_translations() {
-		// phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Bundled German translation.
-		load_plugin_textdomain( 'dsgvo-fonts', false, dirname( plugin_basename( WPDF_FILE ) ) . '/languages' );
 	}
 
 	/**

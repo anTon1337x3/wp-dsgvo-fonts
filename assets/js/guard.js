@@ -7,7 +7,7 @@
 	});
 	var loaderHost = 'ajax.' + apis + '.com';
 	var fontawesome = new RegExp('^(use|pro|kit|ka-f|ka-p|kit-free|kit-pro|free)[.]' + ['font', 'awesome'].join('') + '[.]com$', 'i');
-	var sharedCdn = /^(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|(maxcdn|stackpath|netdna)\.bootstrapcdn\.com|unpkg\.com)$/i;
+	var sharedCdn = /^(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|(maxcdn|stackpath|netdna)\.bootstrapcdn\.com)$/i;
 	var faPath = /font-?awesome|@fortawesome/i;
 	var urlInHtml = /(?:https?:)?\/\/[^\s"'<>()`]+/gi;
 

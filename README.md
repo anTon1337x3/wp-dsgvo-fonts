@@ -1,4 +1,4 @@
-# DSGVO Fonts
+# knuspermedia Local Fonts & Icons
 
 WordPress plugin that automatically self-hosts **Google Fonts** and **Font Awesome** and prevents every request to Google's and Font Awesome's servers. Visitors no longer connect to `fonts.googleapis.com`, `fonts.gstatic.com`, `use.fontawesome.com`, `kit.fontawesome.com` and the like: no IP address is transmitted and no cookie is set. This addresses the German court rulings on Google Fonts and the GDPR (DSGVO); the plugin is a technical tool and doesn't guarantee legal compliance.
 
@@ -9,7 +9,7 @@ The plugin buffers the HTML output of every frontend page (including the login p
 | Embedding | What happens |
 |---|---|
 | `<link href="//fonts.googleapis.com/css?family=…">` (API v1 and `css2`) | The stylesheet is fetched server-side, reduced to the selected subsets, `font-display` is added, all WOFF2 files are stored locally |
-| Font Awesome via `use.fontawesome.com`, `pro.fontawesome.com`, `cdnjs`, `jsdelivr`, `unpkg`, `maxcdn/stackpath/netdna.bootstrapcdn.com` (CSS and JS) | CSS and webfonts are mirrored, `integrity` attributes are removed |
+| Font Awesome via `use.fontawesome.com`, `pro.fontawesome.com`, `cdnjs`, `jsdelivr`, `maxcdn/stackpath/netdna.bootstrapcdn.com` (CSS and JS) | CSS and webfonts are mirrored, `integrity` attributes are removed |
 | Font Awesome Kit `<script src="https://kit.fontawesome.com/xxxx.js">` | Replaced by a local Font Awesome Free in the kit's version (plus v4 shims) |
 | `@import` in theme / plugin stylesheets (also nested) | A cleaned copy of the stylesheet is served |
 | Inline `<style>@import …</style>`, URLs in JS / JSON (`https:\/\/fonts…`) | Replaced by local URLs |
@@ -17,15 +17,15 @@ The plugin buffers the HTML output of every frontend page (including the login p
 | `preconnect` / `dns-prefetch` to Google / Font Awesome | Removed, as are hints for CDNs that are no longer used afterwards |
 | Fonts injected by JavaScript (sliders, widgets, Divi sticky elements, Google Maps …) | Blocked in the browser (JS guard, can be disabled): via `href`/`src`, `setAttribute`, `appendChild`/`append` & co. (e.g. jQuery `.append('<link …>')`), `innerHTML`, `insertAdjacentHTML` and `document.write` |
 
-Files are downloaded once on the first page view; afterwards everything is served from `wp-content/uploads/dsgvo-fonts/` (subfolders `google-fonts/` and `font-awesome/`). The providers' host names appear neither in the local paths nor in the JS guard, so GDPR scanners that search the page source for `fonts.googleapis.com` don't raise false alarms.
+Files are downloaded once on the first page view; afterwards everything is served from `wp-content/uploads/local-fonts/` (subfolders `google-fonts/` and `font-awesome/`). The providers' host names appear neither in the local paths nor in the JS guard, so GDPR scanners that search the page source for `fonts.googleapis.com` don't raise false alarms.
 
 If a file can't be downloaded, the embedding is blocked (fallback font instead of a data leak) and retried after 15 minutes.
 
 ## Installation
 
-1. Copy the `dsgvo-fonts` folder to `wp-content/plugins/` (or upload it as a ZIP).
+1. Copy the `knuspermedia-local-fonts-icons` folder to `wp-content/plugins/` (or upload it as a ZIP).
 2. Activate the plugin. **Deactivate OMGF / OMGF Pro** so the two plugins don't interfere.
-3. Under **Settings → DSGVO Fonts**, use "Check page" to verify that no references are left.
+3. Under **Settings → Local Fonts & Icons**, use "Check page" to verify that no references are left.
 4. Clear the page cache (WP Rocket, W3TC, LiteSpeed, WP Super Cache, Autoptimize and others are purged automatically).
 
 ## Settings
@@ -37,13 +37,13 @@ If a file can't be downloaded, the embedding is blocked (fallback font instead o
 - JavaScript guard against injected fonts
 - Font Awesome version for kits (default: detected automatically, fallback 6.7.2) and v4 compatibility
 
-The font cache is cleared automatically when the settings are saved. The admin UI is in English, with a German translation in `languages/`.
+The font cache is cleared automatically when the settings are saved. The admin UI is in English; translations come from translate.wordpress.org.
 
 ## WP-CLI
 
 ```bash
-wp dsgvo-fonts flush          # delete local copies, purge page caches
-wp dsgvo-fonts scan [<url>]   # check a page for remaining references
+wp local-fonts-icons flush    # delete local copies, purge page caches
+wp local-fonts-icons scan [<url>]   # check a page for remaining references
 ```
 
 ## Debugging
@@ -70,10 +70,10 @@ tests/e2e/run.sh down   # clean up
 ## Release
 
 ```bash
-bin/build-zip.sh   # builds dist/dsgvo-fonts.zip (compiles translations, leaves out everything in .distignore)
+bin/build-zip.sh   # builds dist/knuspermedia-local-fonts-icons.zip, leaving out everything in .distignore
 ```
 
-The WordPress.org listing is described in `readme.txt`; its icon lives in `.wordpress-org/` (uploaded to the SVN `assets` folder, not part of the ZIP) and is generated by `bin/icon/build.sh`. To update translations after changing strings, regenerate `languages/dsgvo-fonts.pot` with `wp i18n make-pot . languages/dsgvo-fonts.pot --exclude=tests,bin,dist` and update `languages/dsgvo-fonts-de_DE.po`.
+The WordPress.org listing is described in `readme.txt`; its icon lives in `.wordpress-org/` (uploaded to the SVN `assets` folder, not part of the ZIP) and is generated by `bin/icon/build.sh`. Translations are managed on translate.wordpress.org and are not part of the ZIP. `languages/` keeps the template and the German translation for importing there; after changing strings, regenerate it with `wp i18n make-pot . languages/knuspermedia-local-fonts-icons.pot --exclude=tests,bin,dist,languages` and update `languages/knuspermedia-local-fonts-icons-de_DE.po`.
 
 ## License
 

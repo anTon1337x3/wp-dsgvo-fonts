@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: DSGVO Fonts – E2E fixtures
+ * Plugin Name: knuspermedia Local Fonts & Icons E2E fixtures
  * Description: Embeds Google Fonts and Font Awesome in every way the plugin has to handle.
  */
 
@@ -57,6 +57,7 @@ add_action(
 		?>
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link rel="preconnect" href="https://use.fontawesome.com">
+		<script src="https://kit.fontawesome.com/9876543210.js" crossorigin="anonymous"></script>
 		<style>@import url('//fonts.googleapis.com/css?family=Pacifico');</style>
 		<script>var wpdfFixtureConfig = {"fontUrl":"https:\/\/fonts.googleapis.com\/css?family=Poppins:400&display=swap"};</script>
 		<style>

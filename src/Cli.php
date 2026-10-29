@@ -13,7 +13,7 @@ class Cli {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp dsgvo-fonts flush
+	 *     wp local-fonts-icons flush
 	 */
 	public function flush() {
 		Cache::flush_all();
@@ -30,7 +30,7 @@ class Cli {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp dsgvo-fonts scan https://example.com/contact/
+	 *     wp local-fonts-icons scan https://example.com/contact/
 	 */
 	public function scan( $args ) {
 		$result = Scanner::scan( $args[0] ?? home_url( '/' ) );

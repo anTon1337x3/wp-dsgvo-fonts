@@ -5,20 +5,20 @@ namespace WPDsgvoFonts;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Local copies live in wp-content/uploads/dsgvo-fonts/{folder}/{path}.
+ * Local copies live in wp-content/uploads/local-fonts/{folder}/{path}.
  */
 class Storage {
-	const DIR = 'dsgvo-fonts';
+	const DIR = 'local-fonts';
 
 	/**
-	 * Folder used before the plugin was renamed from "WP DSGVO Fonts".
+	 * Folders used under the plugin's earlier names "WP DSGVO Fonts" and "DSGVO Fonts".
 	 */
-	const LEGACY_DIR = 'wp-dsgvo-fonts';
+	const LEGACY_DIRS = [ 'wp-dsgvo-fonts', 'dsgvo-fonts' ];
 
 	/**
 	 * Bumped whenever path_for() changes, so copies stored under the old layout get replaced.
 	 */
-	const LAYOUT = 3;
+	const LAYOUT = 4;
 
 	// The host names below are what this plugin looks for in order to replace them with local copies; nothing is
 	// loaded from these hosts in the browser.
@@ -34,7 +34,6 @@ class Storage {
 		'ajax.googleapis.com'        => 'google-fonts/loader',
 		'cdnjs.cloudflare.com'       => 'font-awesome/cdnjs',
 		'cdn.jsdelivr.net'           => 'font-awesome/jsdelivr',
-		'unpkg.com'                  => 'font-awesome/unpkg',
 		'maxcdn.bootstrapcdn.com'    => 'font-awesome/bootstrapcdn',
 		'stackpath.bootstrapcdn.com' => 'font-awesome/bootstrapcdn',
 		'netdna.bootstrapcdn.com'    => 'font-awesome/bootstrapcdn',
@@ -164,7 +163,10 @@ class Storage {
 
 	public static function flush() {
 		self::delete_dir( self::base_dir() );
-		self::delete_dir( trailingslashit( wp_get_upload_dir()['basedir'] ) . self::LEGACY_DIR );
+
+		foreach ( self::LEGACY_DIRS as $legacy ) {
+			self::delete_dir( trailingslashit( wp_get_upload_dir()['basedir'] ) . $legacy );
+		}
 	}
 
 	private static function delete_dir( $dir ) {

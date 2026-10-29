@@ -46,7 +46,7 @@ class Downloader {
 		}
 
 		if ( $body === '' ) {
-			return new \WP_Error( 'wpdf_empty', __( 'Empty response', 'dsgvo-fonts' ) );
+			return new \WP_Error( 'wpdf_empty', __( 'Empty response', 'knuspermedia-local-fonts-icons' ) );
 		}
 
 		return [

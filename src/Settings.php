@@ -16,15 +16,15 @@ class Settings {
 		return array_combine(
 			self::SUBSETS,
 			[
-				__( 'Latin', 'dsgvo-fonts' ),
-				__( 'Latin Extended (e.g. ő, ł, ş)', 'dsgvo-fonts' ),
-				__( 'Cyrillic', 'dsgvo-fonts' ),
-				__( 'Cyrillic Extended', 'dsgvo-fonts' ),
-				__( 'Greek', 'dsgvo-fonts' ),
-				__( 'Greek Extended', 'dsgvo-fonts' ),
-				__( 'Vietnamese', 'dsgvo-fonts' ),
-				__( 'Math symbols', 'dsgvo-fonts' ),
-				__( 'Symbols', 'dsgvo-fonts' ),
+				__( 'Latin', 'knuspermedia-local-fonts-icons' ),
+				__( 'Latin Extended (e.g. ő, ł, ş)', 'knuspermedia-local-fonts-icons' ),
+				__( 'Cyrillic', 'knuspermedia-local-fonts-icons' ),
+				__( 'Cyrillic Extended', 'knuspermedia-local-fonts-icons' ),
+				__( 'Greek', 'knuspermedia-local-fonts-icons' ),
+				__( 'Greek Extended', 'knuspermedia-local-fonts-icons' ),
+				__( 'Vietnamese', 'knuspermedia-local-fonts-icons' ),
+				__( 'Math symbols', 'knuspermedia-local-fonts-icons' ),
+				__( 'Symbols', 'knuspermedia-local-fonts-icons' ),
 			]
 		);
 	}

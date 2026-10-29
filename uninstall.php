@@ -13,8 +13,8 @@ require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
 $wpdf_filesystem = new WP_Filesystem_Direct( null );
 $wpdf_uploads    = trailingslashit( wp_get_upload_dir()['basedir'] );
 
-// Current folder and the one used before the plugin was renamed from "WP DSGVO Fonts".
-foreach ( [ 'dsgvo-fonts', 'wp-dsgvo-fonts' ] as $wpdf_dir ) {
+// Current folder and the ones used under the plugin's earlier names "WP DSGVO Fonts" and "DSGVO Fonts".
+foreach ( [ 'local-fonts', 'dsgvo-fonts', 'wp-dsgvo-fonts' ] as $wpdf_dir ) {
 	if ( is_dir( $wpdf_uploads . $wpdf_dir ) ) {
 		$wpdf_filesystem->rmdir( $wpdf_uploads . $wpdf_dir, true );
 	}
